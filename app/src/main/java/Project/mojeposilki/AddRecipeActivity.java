@@ -1,5 +1,7 @@
 package Project.mojeposilki;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.view.View;
@@ -13,8 +15,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import android.util.Xml;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
+
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.List;
+
 
 public class AddRecipeActivity extends AppCompatActivity {
 
@@ -67,8 +83,6 @@ public class AddRecipeActivity extends AppCompatActivity {
         // Validate each product (ingredient)
         for (int i = 0; i < productList.size(); i++) {
             Product product = productList.get(i);
-            System.out.println("product.getSkladnik() " + product.getSkladnik().isEmpty() +
-                    " product.getIlosc()" + product.getIlosc().isEmpty() + " product.getJednostka()" + product.getJednostka().isEmpty());
             if (product.getSkladnik().isEmpty() || product.getIlosc().isEmpty() || product.getJednostka().isEmpty()) {
                 Toast.makeText(this, "Please fill out all fields for each ingredient", Toast.LENGTH_SHORT).show();
                 return;
@@ -80,8 +94,22 @@ public class AddRecipeActivity extends AppCompatActivity {
             }
         }
 
-        // Code to save the recipe and products (ingredients)
-        Toast.makeText(this, "Recipe saved!", Toast.LENGTH_SHORT).show();
+
+        // Zapisanie przepisu do bazy danych
+        MealDatabaseHelper dbHelper = new MealDatabaseHelper(this);
+        long currentTimeMillis = System.currentTimeMillis(); // Możesz użyć tej wartości jako daty
+
+        // Zapisujemy samą nazwę przepisu z datą
+        dbHelper.addMeal(recipeName, currentTimeMillis);
+
+        // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
+        // ...
+
+        Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
+
+        // Po zapisaniu przepisu przechodzimy do MainActivity
+        Intent intent = new Intent(AddRecipeActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     private boolean isNumeric(String str) {

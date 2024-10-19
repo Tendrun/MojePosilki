@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MojePosilki"
         tools:targetApi="31">
-        <activity android:name=".AddRecipeActivity"
+        <activity android:name=".MainActivity"
             android:exported="true">
             <!-- Make it the launch activity (entry point of your app) -->
             <intent-filter>
@@ -20,5 +20,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AddRecipeActivity">
+        </activity>
+
+        <activity
+            android:name=".ViewMealsActivity">
+        </activity>
+
+        <activity
+            android:name=".CalendarActivity">
+        </activity>
+
+        <activity
+            android:name=".ModifyMealActivity">
+        </activity>
+
     </application>
 </manifest>
