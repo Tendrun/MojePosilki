@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Moje Posilki</string>
+    <string-array name="meal_sort_options">
+        <item>A-Z (Alphabetical)</item>
+        <item>Z-A (Reverse Alphabetical)</item>
+    </string-array>
 </resources>

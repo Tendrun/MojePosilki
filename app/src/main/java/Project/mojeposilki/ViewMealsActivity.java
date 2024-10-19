@@ -8,12 +8,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -22,6 +21,8 @@ public class ViewMealsActivity extends AppCompatActivity {
 
     private ListView lvMeals;
     private MealDatabaseHelper mealDatabaseHelper;
+    private Spinner spinnerSort;
+    private MealCursorAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +30,26 @@ public class ViewMealsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_meals);
 
         lvMeals = findViewById(R.id.lv_meals);
+        spinnerSort = findViewById(R.id.spinner_sort);
         mealDatabaseHelper = new MealDatabaseHelper(this);
 
-        // Retrieve saved meals from the database (sorted alphabetically)
-        Cursor cursor = mealDatabaseHelper.getAllMealsSorted();
+        // Load default sorted list (A-Z)
+        loadMeals("A-Z (Alphabetical)");
 
-        // Create a custom adapter to handle date formatting
-        MealCursorAdapter adapter = new MealCursorAdapter(this, cursor, 0);
+        // Set listener for Spinner item selection
+        spinnerSort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedSort = parent.getItemAtPosition(position).toString();
+                loadMeals(selectedSort);
+            }
 
-        // Set the adapter to the ListView
-        lvMeals.setAdapter(adapter);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Default sort
+                loadMeals("A-Z (Alphabetical)");
+            }
+        });
 
         // Set click listener for each meal item
         lvMeals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -50,6 +61,29 @@ public class ViewMealsActivity extends AppCompatActivity {
                 showMealOptionsDialog(mealId);
             }
         });
+    }
+
+    // Load meals based on selected sorting option
+    private void loadMeals(String sortBy) {
+        Cursor cursor;
+        switch (sortBy) {
+            case "A-Z (Alphabetical)":
+                cursor = mealDatabaseHelper.getAllMealsSortedByNameAsc();
+                break;
+            case "Z-A (Reverse Alphabetical)":
+                cursor = mealDatabaseHelper.getAllMealsSortedByNameDesc();
+                break;
+            default:
+                cursor = mealDatabaseHelper.getAllMealsSortedByNameAsc(); // Default sort
+                break;
+        }
+
+        if (adapter == null) {
+            adapter = new MealCursorAdapter(this, cursor, 0);
+            lvMeals.setAdapter(adapter);
+        } else {
+            adapter.changeCursor(cursor);
+        }
     }
 
     // Method to show a dialog with options to delete or modify the meal
@@ -77,8 +111,7 @@ public class ViewMealsActivity extends AppCompatActivity {
     private void deleteMeal(long mealId) {
         mealDatabaseHelper.deleteMeal(mealId);
         // Refresh the list after deletion
-        Cursor newCursor = mealDatabaseHelper.getAllMealsSorted();
-        ((MealCursorAdapter) lvMeals.getAdapter()).changeCursor(newCursor);
+        loadMeals(spinnerSort.getSelectedItem().toString());
         Toast.makeText(this, "Meal deleted", Toast.LENGTH_SHORT).show();
     }
 

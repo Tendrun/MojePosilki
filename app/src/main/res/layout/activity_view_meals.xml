@@ -5,6 +5,12 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <Spinner
+        android:id="@+id/spinner_sort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/meal_sort_options" />
+
     <ListView
         android:id="@+id/lv_meals"
         android:layout_width="match_parent"

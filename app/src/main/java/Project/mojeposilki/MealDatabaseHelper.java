@@ -100,40 +100,29 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-
-
-    // Method to add an ingredient to the database (without needing mealId initially)
-    public void addIngredient(String skladnik, String ilosc, String jednostka) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_SKLADNIK, skladnik);
-        values.put(COLUMN_ILOSC, ilosc);
-        values.put(COLUMN_JEDNOSTKA, jednostka);
-
-        // Insert ingredient with meal_id being NULL initially
-        db.insert(TABLE_INGREDIENTS, null, values);
-        db.close();
-    }
-
-    // Method to update ingredients with a meal_id after the meal is added
-    public void updateIngredientWithMealId(long ingredientId, long mealId) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_MEAL_ID, mealId); // Assign meal_id to the ingredient
-
-        db.update(TABLE_INGREDIENTS, values, COLUMN_INGREDIENT_ID + "=?", new String[]{String.valueOf(ingredientId)});
-        db.close();
-    }
-
-    // Method to retrieve all meals
-    public Cursor getAllMeals() {
+    // Get all meals sorted alphabetically
+    // Get all meals sorted alphabetically (A-Z)
+    public Cursor getAllMealsSortedByNameAsc() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_MEALS, null);
+        return db.query(TABLE_MEALS, null, null, null, null, null, COLUMN_MEAL_NAME + " ASC");
     }
 
-    // Method to retrieve all ingredients
-    public Cursor getAllIngredients() {
+    // Get all meals sorted in reverse alphabetical order (Z-A)
+    public Cursor getAllMealsSortedByNameDesc() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_INGREDIENTS, null);
+        return db.query(TABLE_MEALS, null, null, null, null, null, COLUMN_MEAL_NAME + " DESC");
     }
+
+    // Method to retrieve a meal by its ID
+    public Cursor getMealById(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.query(TABLE_MEALS, null, "_id = ?", new String[]{String.valueOf(id)}, null, null, null);
+    }
+
+    // Method to update a meal in the database
+    public int updateMeal(long id, ContentValues values) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.update(TABLE_MEALS, values, "_id = ?", new String[]{String.valueOf(id)});
+    }
+
 }

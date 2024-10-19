@@ -16,7 +16,22 @@
         android:padding="12dp"
         android:layout_marginBottom="20dp"/>
 
-    <!-- Save button to save the modified meal name -->
+    <!-- RecyclerView for the list of ingredients -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/productRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Button to add a new ingredient -->
+    <Button
+        android:id="@+id/addProductButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Ingredient"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Save button to save the modified meal and ingredients -->
     <Button
         android:id="@+id/btn_save"
         android:layout_width="match_parent"
