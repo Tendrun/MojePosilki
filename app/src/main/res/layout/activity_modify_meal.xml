@@ -5,40 +5,31 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- EditText for entering the meal name -->
+    <!-- EditText for the recipe/meal name -->
     <EditText
-        android:id="@+id/et_meal_name"
+        android:id="@+id/recipeName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter meal name"
-        android:textSize="18sp"
-        android:inputType="textPersonName"
-        android:padding="12dp"
-        android:layout_marginBottom="20dp"/>
+        android:hint="Nazwa przepisu"
+        android:inputType="text" />
 
-    <!-- RecyclerView for the list of ingredients -->
+    <!-- RecyclerView for listing ingredients -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp" />
+        android:layout_height="wrap_content" />
 
-    <!-- Button to add a new ingredient -->
+    <!-- Button for adding new ingredients -->
     <Button
         android:id="@+id/addProductButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Ingredient"
-        android:layout_marginBottom="20dp"/>
+        android:text="Add Ingredient" />
 
-    <!-- Save button to save the modified meal and ingredients -->
+    <!-- Button for saving the modified recipe -->
     <Button
-        android:id="@+id/btn_save"
-        android:layout_width="match_parent"
+        android:id="@+id/saveRecipeButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:textColor="@android:color/white"/>
-
+        android:text="Save Recipe" />
 </LinearLayout>

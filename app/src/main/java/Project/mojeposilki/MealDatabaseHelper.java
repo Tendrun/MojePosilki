@@ -87,14 +87,11 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        db.execSQL("DELETE FROM " + TABLE_MEALS);
-
         // First, delete all ingredients associated with the meal (if needed)
         db.execSQL("DELETE FROM " + TABLE_INGREDIENTS + " WHERE " + COLUMN_MEAL_ID + " = " + mealId);
 
         // Then, delete the meal itself
         db.delete(TABLE_MEALS, COLUMN_ID + "=?", new String[]{String.valueOf(mealId)});
-
 
 
         db.close();
@@ -122,7 +119,9 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     // Method to update a meal in the database
     public int updateMeal(long id, ContentValues values) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.update(TABLE_MEALS, values, "_id = ?", new String[]{String.valueOf(id)});
+        int rowsAffected = db.update(TABLE_MEALS, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+        db.close();  // Close the database connection after update
+        return rowsAffected;
     }
 
 }

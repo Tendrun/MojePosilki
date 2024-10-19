@@ -8,117 +8,161 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class ModifyMealActivity extends AppCompatActivity {
 
-    private EditText recipeName;
+    private EditText recipeNameField;
     private RecyclerView productRecyclerView;
-    private ProductAdapter productAdapter;
     private Button addProductButton, saveRecipeButton;
-    private MealDatabaseHelper mealDatabaseHelper;
-    private long mealId; // This will hold the ID of the meal we are modifying
-    private ArrayList<String> ingredientsList;
+    private List<Product> productList;
+    private ProductAdapter productAdapter;
+    private long mealId = -1;  // Default value for new meal
+
+    private MealDatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_modify_meal);
+        setContentView(R.layout.activity_add_recipe);
 
-        recipeName = findViewById(R.id.recipeName);
+        // Initialize views
+        recipeNameField = findViewById(R.id.recipeName);
         productRecyclerView = findViewById(R.id.productRecyclerView);
         addProductButton = findViewById(R.id.addProductButton);
         saveRecipeButton = findViewById(R.id.saveRecipeButton);
 
-        mealDatabaseHelper = new MealDatabaseHelper(this);
+        // Initialize the database helper
+        dbHelper = new MealDatabaseHelper(this);
 
-        // Retrieve the meal ID passed from the previous activity
-        mealId = getIntent().getLongExtra("mealId", -1);
+        // Retrieve the meal ID if this is an edit operation
+        Intent intent = getIntent();
+        mealId = intent.getLongExtra("mealId", -1);  // Defaults to -1 if no ID is passed
 
+        /*
+        // If we're editing, load the meal details
         if (mealId != -1) {
-            loadMealDetails(mealId); // Load the meal details to modify
+            loadMealDetails(mealId);
         }
-
-        // Setup RecyclerView for ingredients
-        ingredientsList = new ArrayList<>();
-        productAdapter = new ProductAdapter(ingredientsList);
+*/
+        // Initialize product list and adapter
+        productList = new ArrayList<>();
+        productAdapter = new ProductAdapter(productList, this::removeProduct);
         productRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         productRecyclerView.setAdapter(productAdapter);
 
-        // Button to add a new ingredient
-        addProductButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addNewIngredient();
-            }
-        });
+        // Add new product when button is clicked
+        addProductButton.setOnClickListener(v -> addNewProduct());
 
-        // Save the modified meal to the database
-        saveRecipeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveModifiedMeal();
-            }
-        });
+        // Save the recipe when the button is clicked
+        saveRecipeButton.setOnClickListener(v -> saveRecipe());
     }
 
-    // Method to load meal details from the database
+    // Method to load meal details from the database for editing
     private void loadMealDetails(long mealId) {
-        Cursor cursor = mealDatabaseHelper.getMealById(mealId);
+        Cursor cursor = dbHelper.getMealById(mealId);
         if (cursor != null && cursor.moveToFirst()) {
-            // Set the meal name to the EditText
             String mealName = cursor.getString(cursor.getColumnIndex("meal_name"));
-            recipeName.setText(mealName);
+            recipeNameField.setText(mealName);
 
-            // Load the list of ingredients (if stored as a comma-separated string)
+            // Load ingredients (assuming they're stored as a string, comma-separated)
             String ingredients = cursor.getString(cursor.getColumnIndex("ingredients"));
             if (ingredients != null && !ingredients.isEmpty()) {
                 String[] ingredientArray = ingredients.split(",");
                 for (String ingredient : ingredientArray) {
-                    ingredientsList.add(ingredient.trim());
+                    productList.add(new Product(ingredient, "", ""));  // Add products to the list (you can adapt this to your structure)
                 }
                 productAdapter.notifyDataSetChanged();
             }
         }
     }
 
-    // Add a new ingredient to the RecyclerView
-    private void addNewIngredient() {
-        ingredientsList.add(""); // Add an empty ingredient for the user to fill in
-        productAdapter.notifyItemInserted(ingredientsList.size() - 1);
+    private void addNewProduct() {
+        // Create a new empty product and add to the list
+        productList.add(new Product("", "", ""));
+        productAdapter.notifyItemInserted(productList.size() - 1);
     }
 
-    // Save the modified meal details
-    private void saveModifiedMeal() {
-        String updatedMealName = recipeName.getText().toString().trim();
+    private void removeProduct(int position) {
+        productList.remove(position);
+        productAdapter.notifyItemRemoved(position);
+    }
 
-        // Convert ingredients list to a comma-separated string
-        StringBuilder ingredientsBuilder = new StringBuilder();
-        for (String ingredient : ingredientsList) {
-            if (!ingredient.isEmpty()) {
-                ingredientsBuilder.append(ingredient).append(",");
+    private void saveRecipe() {
+
+        String recipeName = recipeNameField.getText().toString().trim();
+        if (recipeName.isEmpty()) {
+            recipeNameField.setError("Recipe name cannot be empty");
+            return;
+        }
+
+        // Validate each product (ingredient)
+        for (int i = 0; i < productList.size(); i++) {
+            Product product = productList.get(i);
+            if (product.getSkladnik().isEmpty() || product.getIlosc().isEmpty() || product.getJednostka().isEmpty()) {
+                Toast.makeText(this, "Please fill out all fields for each ingredient", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!isNumeric(product.getIlosc())) {
+                Toast.makeText(this, "Invalid numeric value in ingredient " + (i + 1), Toast.LENGTH_SHORT).show();
+                return;
             }
         }
 
-        if (ingredientsBuilder.length() > 0) {
-            ingredientsBuilder.deleteCharAt(ingredientsBuilder.length() - 1); // Remove trailing comma
+        // Save the recipe to the database
+        if (mealId != -1) {
+            // Update the existing meal
+            ContentValues values = new ContentValues();
+            values.put("meal_name", recipeName);
+
+            int rowsUpdated = dbHelper.updateMeal(mealId, values);
+            if (rowsUpdated > 0) {
+                Toast.makeText(this, "Recipe updated successfully!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Failed to update recipe!", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Add a new meal if it's not an edit
+            long currentTimeMillis = System.currentTimeMillis();  // Use this as the date
+            mealId = dbHelper.addMeal(recipeName, currentTimeMillis);  // Get the new meal ID
+            Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
         }
 
-        String updatedIngredients = ingredientsBuilder.toString();
+        // Save the ingredients
+        dbHelper.deleteMeal(mealId);  // Clear old ingredients for this mealId
 
-        // Prepare values to update in the database
-        ContentValues values = new ContentValues();
-        values.put("meal_name", updatedMealName);
-        values.put("ingredients", updatedIngredients);
+        // Zapisanie przepisu do bazy danych
+        MealDatabaseHelper dbHelper = new MealDatabaseHelper(this);
+        long currentTimeMillis = System.currentTimeMillis(); // Możesz użyć tej wartości jako daty
 
-        // Update the meal in the database
-        mealDatabaseHelper.updateMeal(mealId, values);
+        // Zapisujemy samą nazwę przepisu z datą
+        dbHelper.addMeal(recipeName, currentTimeMillis);
 
-        // Show a message and finish the activity
-        Toast.makeText(this, "Meal updated successfully!", Toast.LENGTH_SHORT).show();
-        finish(); // Close the activity and go back to the previous screen
+        // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
+        // ...
+
+        Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
+
+
+        // Po zapisaniu przepisu przechodzimy do MainActivity
+        Intent intent = new Intent(ModifyMealActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+
+    private boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
