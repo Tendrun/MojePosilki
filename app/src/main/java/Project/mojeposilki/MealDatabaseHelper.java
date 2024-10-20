@@ -17,6 +17,7 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_MEALS = "meals";
     private static final String COLUMN_ID = "_id";
     private static final String COLUMN_MEAL_NAME = "meal_name";
+    private static final String COLUMN_MEAL_DESCRIPTION = "description";
     private static final String COLUMN_DATE = "meal_date"; // date in milliseconds
 
     // Table for ingredients
@@ -29,15 +30,18 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     public MealDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(SQLiteDatabase db) {;
+
         // Create meals table
         String CREATE_MEALS_TABLE = "CREATE TABLE " + TABLE_MEALS + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_MEAL_NAME + " TEXT,"
-                + COLUMN_DATE + " INTEGER"
+                + COLUMN_DATE + " INTEGER,"
+                + COLUMN_MEAL_DESCRIPTION + " TEXT"
                 + ")";
         db.execSQL(CREATE_MEALS_TABLE);
 
@@ -60,17 +64,12 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    //Sortowanie alfabetyczne
-    public Cursor getAllMealsSorted() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_MEALS + " ORDER BY " + COLUMN_MEAL_NAME + " ASC", null);
-    }
-
     // Method to add a meal to the database (meal name with optional date)
-    public long addMeal(String mealName, long dateInMillis) {
+    public long addMeal(String mealName, long dateInMillis, String description) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_MEAL_NAME, mealName);
+        values.put(COLUMN_MEAL_DESCRIPTION, description);
         values.put(COLUMN_DATE, dateInMillis);
 
         // Insert and return the new meal ID

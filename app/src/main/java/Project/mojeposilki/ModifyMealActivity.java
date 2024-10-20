@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ModifyMealActivity extends AppCompatActivity {
 
-    private EditText recipeNameField;
+    private EditText recipeNameField, description;
     private RecyclerView productRecyclerView;
     private Button addProductButton, saveRecipeButton;
     private List<Product> productList;
@@ -37,6 +37,7 @@ public class ModifyMealActivity extends AppCompatActivity {
         productRecyclerView = findViewById(R.id.productRecyclerView);
         addProductButton = findViewById(R.id.addProductButton);
         saveRecipeButton = findViewById(R.id.saveRecipeButton);
+        description = findViewById(R.id.Description);
 
         // Initialize the database helper
         dbHelper = new MealDatabaseHelper(this);
@@ -64,25 +65,6 @@ public class ModifyMealActivity extends AppCompatActivity {
         saveRecipeButton.setOnClickListener(v -> saveRecipe());
     }
 
-    // Method to load meal details from the database for editing
-    private void loadMealDetails(long mealId) {
-        Cursor cursor = dbHelper.getMealById(mealId);
-        if (cursor != null && cursor.moveToFirst()) {
-            String mealName = cursor.getString(cursor.getColumnIndex("meal_name"));
-            recipeNameField.setText(mealName);
-
-            // Load ingredients (assuming they're stored as a string, comma-separated)
-            String ingredients = cursor.getString(cursor.getColumnIndex("ingredients"));
-            if (ingredients != null && !ingredients.isEmpty()) {
-                String[] ingredientArray = ingredients.split(",");
-                for (String ingredient : ingredientArray) {
-                    productList.add(new Product(ingredient, "", ""));  // Add products to the list (you can adapt this to your structure)
-                }
-                productAdapter.notifyDataSetChanged();
-            }
-        }
-    }
-
     private void addNewProduct() {
         // Create a new empty product and add to the list
         productList.add(new Product("", "", ""));
@@ -95,7 +77,7 @@ public class ModifyMealActivity extends AppCompatActivity {
     }
 
     private void saveRecipe() {
-
+        String descriptionFormated = description.getText().toString().trim();
         String recipeName = recipeNameField.getText().toString().trim();
         if (recipeName.isEmpty()) {
             recipeNameField.setError("Recipe name cannot be empty");
@@ -131,7 +113,7 @@ public class ModifyMealActivity extends AppCompatActivity {
         } else {
             // Add a new meal if it's not an edit
             long currentTimeMillis = System.currentTimeMillis();  // Use this as the date
-            mealId = dbHelper.addMeal(recipeName, currentTimeMillis);  // Get the new meal ID
+            mealId = dbHelper.addMeal(recipeName, currentTimeMillis, descriptionFormated);  // Get the new meal ID
             Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
         }
 
@@ -143,7 +125,7 @@ public class ModifyMealActivity extends AppCompatActivity {
         long currentTimeMillis = System.currentTimeMillis(); // Możesz użyć tej wartości jako daty
 
         // Zapisujemy samą nazwę przepisu z datą
-        dbHelper.addMeal(recipeName, currentTimeMillis);
+        dbHelper.addMeal(recipeName, currentTimeMillis, descriptionFormated);
 
         // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
         // ...

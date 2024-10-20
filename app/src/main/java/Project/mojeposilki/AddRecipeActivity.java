@@ -16,7 +16,7 @@ import java.util.List;
 
 public class AddRecipeActivity extends AppCompatActivity {
 
-    private EditText recipeNameField;
+    private EditText recipeNameField, description;
     private RecyclerView productRecyclerView;
     private Button addProductButton, saveRecipeButton;
     private List<Product> productList;
@@ -31,6 +31,8 @@ public class AddRecipeActivity extends AppCompatActivity {
         productRecyclerView = findViewById(R.id.productRecyclerView);
         addProductButton = findViewById(R.id.addProductButton);
         saveRecipeButton = findViewById(R.id.saveRecipeButton);
+        description = findViewById(R.id.Description);
+
 
         // Initialize product list and adapter
         productList = new ArrayList<>();
@@ -57,6 +59,7 @@ public class AddRecipeActivity extends AppCompatActivity {
 
     private void saveRecipe() {
         String recipeName = recipeNameField.getText().toString().trim();
+        String descriptionFormated = description.getText().toString().trim();
         if (recipeName.isEmpty()) {
             recipeNameField.setError("Recipe name cannot be empty");
             return;
@@ -82,7 +85,7 @@ public class AddRecipeActivity extends AppCompatActivity {
         long currentTimeMillis = System.currentTimeMillis(); // Możesz użyć tej wartości jako daty
 
         // Zapisujemy samą nazwę przepisu z datą
-        dbHelper.addMeal(recipeName, currentTimeMillis);
+        dbHelper.addMeal(recipeName, currentTimeMillis, descriptionFormated);
 
         // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
         // ...

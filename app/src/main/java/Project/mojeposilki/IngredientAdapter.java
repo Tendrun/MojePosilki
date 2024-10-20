@@ -50,17 +50,4 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             ingredientEditText = itemView.findViewById(R.id.ingredientEditText);
         }
     }
-
-    // Method to add a new ingredient to the list
-    public void addIngredient(String ingredient) {
-        ingredients.add(ingredient);
-        notifyItemInserted(ingredients.size() - 1);
-    }
-
-    // Method to update the ingredients list (e.g., after fetching from the database)
-    public void setIngredients(List<String> newIngredients) {
-        ingredients.clear();
-        ingredients.addAll(newIngredients);
-        notifyDataSetChanged();
-    }
 }

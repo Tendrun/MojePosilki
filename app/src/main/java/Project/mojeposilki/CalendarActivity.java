@@ -25,9 +25,13 @@ public class CalendarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
+
+       /*
+
         etMealName = findViewById(R.id.et_meal_name);
         datePicker = findViewById(R.id.datePicker);
         btnAddToCalendar = findViewById(R.id.btn_add_to_calendar);
+
 
         // Initialize the database helper
         mealDatabaseHelper = new MealDatabaseHelper(this);
@@ -58,8 +62,16 @@ public class CalendarActivity extends AppCompatActivity {
 
         long startTimeInMillis = cal.getTimeInMillis();
 
+
+
+
+
         // Save the meal and date to the database
         mealDatabaseHelper.addMeal(mealName, startTimeInMillis);
+
+
+
+
 
         // Add meal to the calendar
         Intent intent = new Intent(Intent.ACTION_INSERT)
@@ -74,7 +86,7 @@ public class CalendarActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        Toast.makeText(this, "Meal saved to calendar and database!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Meal saved to calendar and database!", Toast.LENGTH_SHORT).show();*/
     }
 }
 
