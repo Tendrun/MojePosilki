@@ -1,12 +1,15 @@
 package Project.mojeposilki;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.DatePicker;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,80 +18,96 @@ import java.util.Calendar;
 
 public class CalendarActivity extends AppCompatActivity {
 
-    private EditText etMealName;
-    private DatePicker datePicker;
-    private Button btnAddToCalendar;
+    private ListView lvMeals;
     private MealDatabaseHelper mealDatabaseHelper;
+    private MealCursorAdapter adapter;
+    private DatePicker datePicker;
+
+    long mealId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-
-       /*
-
-        etMealName = findViewById(R.id.et_meal_name);
+        lvMeals = findViewById(R.id.lv_meals);
         datePicker = findViewById(R.id.datePicker);
-        btnAddToCalendar = findViewById(R.id.btn_add_to_calendar);
 
-
-        // Initialize the database helper
         mealDatabaseHelper = new MealDatabaseHelper(this);
 
-        btnAddToCalendar.setOnClickListener(new View.OnClickListener() {
+        // Load meals and display them in the ListView
+        loadMeals();
+        // Set an item click listener for when a meal is selected from the list
+        lvMeals.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                mealId = cursor.getLong(cursor.getColumnIndex("_id"));
+                String mealName = cursor.getString(cursor.getColumnIndex("meal_name"));
+                Toast.makeText(CalendarActivity.this, "Selected meal: " + mealName, Toast.LENGTH_SHORT).show();
+                // Handle meal selection logic if needed
+            }
+        });
+
+        // Button to add the selected meal to the calendar
+        findViewById(R.id.btn_add_to_calendar).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addMealToCalendar();
+                addMealToCalendar(mealId);
             }
         });
     }
 
-    private void addMealToCalendar() {
-        String mealName = etMealName.getText().toString().trim();
+    // Load meals from the database and bind them to the ListView
+    private void loadMeals() {
+        Cursor cursor = mealDatabaseHelper.getAllMealsSortedByNameAsc();
 
-        if (mealName.isEmpty()) {
-            Toast.makeText(this, "Please enter a meal name", Toast.LENGTH_SHORT).show();
-            return;
+        if (adapter == null) {
+            adapter = new MealCursorAdapter(this, cursor, 0);
+            lvMeals.setAdapter(adapter);
+        } else {
+            adapter.changeCursor(cursor);
         }
+    }
 
-        // Get the selected date from the DatePicker
-        int year = datePicker.getYear();
-        int month = datePicker.getMonth();
+    // Method to add the selected meal to the calendar
+    private void addMealToCalendar(long mealId) {
         int day = datePicker.getDayOfMonth();
+        int month = datePicker.getMonth();
+        int year = datePicker.getYear();
 
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, month, day);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, 0, 0, 0); // Set to midnight (optional)
+        calendar.set(Calendar.MILLISECOND, 0);
 
-        long startTimeInMillis = cal.getTimeInMillis();
+        // Handle adding meal logic with date here
+        MealDatabaseHelper dbHelper = new MealDatabaseHelper(this);
+        //TODO
+        dbHelper.addMealToCalendar(mealId, calendar.getTimeInMillis());
 
+        Toast.makeText(this, "Meal added to calendar", Toast.LENGTH_SHORT).show();
+    }
 
+    // Custom adapter for the ListView
+    public class MealCursorAdapter extends android.widget.SimpleCursorAdapter {
 
-
-
-        // Save the meal and date to the database
-        mealDatabaseHelper.addMeal(mealName, startTimeInMillis);
-
-
-
-
-
-        // Add meal to the calendar
-        Intent intent = new Intent(Intent.ACTION_INSERT)
-                .setData(CalendarContract.Events.CONTENT_URI)
-                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTimeInMillis)
-                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, startTimeInMillis + 60 * 60 * 1000) // 1 hour for meal
-                .putExtra(CalendarContract.Events.TITLE, "Meal: " + mealName)
-                .putExtra(CalendarContract.Events.DESCRIPTION, "Enjoy your meal!")
-                .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
-
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
+        public MealCursorAdapter(Context context, Cursor c, int flags) {
+            super(context, R.layout.meal_list_item, c, new String[]{
+                    "meal_name" // Column name in database
+            }, new int[]{
+                    R.id.tv_meal_name  // ID of TextView in meal_list_item.xml
+            }, flags);
         }
 
-        Toast.makeText(this, "Meal saved to calendar and database!", Toast.LENGTH_SHORT).show();*/
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView mealNameTextView = view.findViewById(R.id.tv_meal_name);
+
+            // Get meal name from the cursor
+            String mealName = cursor.getString(cursor.getColumnIndex("meal_name"));
+
+            // Set meal name to TextView
+            mealNameTextView.setText(mealName);
+        }
     }
 }
-
-
-

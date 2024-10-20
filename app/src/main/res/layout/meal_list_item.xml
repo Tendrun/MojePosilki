@@ -1,23 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- meal_list_item.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:orientation="vertical">
 
+    <!-- Meal name -->
     <TextView
         android:id="@+id/tv_meal_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Meal Name"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textSize="18sp"/>
 
+    <!-- Meal date -->
     <TextView
         android:id="@+id/tv_meal_date"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Meal Date"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"/>
+
 </LinearLayout>

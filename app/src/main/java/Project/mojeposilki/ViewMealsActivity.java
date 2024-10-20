@@ -68,13 +68,13 @@ public class ViewMealsActivity extends AppCompatActivity {
         Cursor cursor;
         switch (sortBy) {
             case "A-Z (Alphabetical)":
-                cursor = mealDatabaseHelper.getAllMealsSortedByNameAsc();
+                cursor = mealDatabaseHelper.getAllMealsWithDatesSortedByNameAsc();
                 break;
             case "Z-A (Reverse Alphabetical)":
-                cursor = mealDatabaseHelper.getAllMealsSortedByNameDesc();
+                cursor = mealDatabaseHelper.getAllMealsWithDatesSortedByNameDESC();
                 break;
             default:
-                cursor = mealDatabaseHelper.getAllMealsSortedByNameAsc(); // Default sort
+                cursor = mealDatabaseHelper.getAllMealsWithDatesSortedByNameAsc(); // Default sort
                 break;
         }
 
@@ -116,15 +116,15 @@ public class ViewMealsActivity extends AppCompatActivity {
     }
 
     // Custom adapter for handling the conversion of date from milliseconds to human-readable form
-    public class MealCursorAdapter extends android.widget.SimpleCursorAdapter {
+    public static class MealCursorAdapter extends android.widget.SimpleCursorAdapter {
 
         public MealCursorAdapter(Context context, Cursor c, int flags) {
             super(context, R.layout.meal_list_item, c, new String[]{
-                    "meal_name", // Column name in database
-                    "meal_date"  // Column name in database
+                    "meal_name",  // Column name for meal
+                    "meal_date"   // Column name for meal date (calendar)
             }, new int[]{
-                    R.id.tv_meal_name,  // ID of TextView in meal_list_item.xml
-                    R.id.tv_meal_date   // ID of TextView in meal_list_item.xml
+                    R.id.tv_meal_name,   // ID of TextView in meal_list_item.xml for meal name
+                    R.id.tv_meal_date    // ID of TextView in meal_list_item.xml for meal date
             }, flags);
         }
 
@@ -146,11 +146,12 @@ public class ViewMealsActivity extends AppCompatActivity {
             mealDateTextView.setText(formattedDate);
         }
 
-        // Helper method to format the date from milliseconds to "DD-MM-YYYY"
+        // Helper method to format the date from milliseconds to a readable format (e.g., DD-MM-YYYY)
         private String formatDate(long millis) {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
             Date resultDate = new Date(millis);
             return sdf.format(resultDate);
         }
+
     }
 }
