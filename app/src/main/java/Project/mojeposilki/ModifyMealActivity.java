@@ -67,7 +67,7 @@ public class ModifyMealActivity extends AppCompatActivity {
 
     private void addNewProduct() {
         // Create a new empty product and add to the list
-        productList.add(new Product("", "", ""));
+        productList.add(new Product("", "", "", ""));
         productAdapter.notifyItemInserted(productList.size() - 1);
     }
 
@@ -113,22 +113,23 @@ public class ModifyMealActivity extends AppCompatActivity {
         } else {
             // Add a new meal if it's not an edit
             long currentTimeMillis = System.currentTimeMillis();  // Use this as the date
-            mealId = dbHelper.addMeal(recipeName, currentTimeMillis, descriptionFormated);  // Get the new meal ID
+            mealId = dbHelper.addMeal(recipeName, descriptionFormated);  // Get the new meal ID
             Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
         }
 
-        // Save the ingredients
-        dbHelper.deleteMeal(mealId);  // Clear old ingredients for this mealId
-
         // Zapisanie przepisu do bazy danych
         MealDatabaseHelper dbHelper = new MealDatabaseHelper(this);
-        long currentTimeMillis = System.currentTimeMillis(); // Możesz użyć tej wartości jako daty
 
         // Zapisujemy samą nazwę przepisu z datą
-        dbHelper.addMeal(recipeName, currentTimeMillis, descriptionFormated);
+        long MealID = dbHelper.addMeal(recipeName, descriptionFormated);
+
 
         // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
-        // ...
+        for (int i = 0; i < productList.size(); i++) {
+            Product product = productList.get(i);
+            dbHelper.addIngredient(product.getSkladnik(), product.getIlosc(),  product.getJednostka(),
+                    product.getKategoria(), Long.toString(MealID));
+        }
 
         Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
 

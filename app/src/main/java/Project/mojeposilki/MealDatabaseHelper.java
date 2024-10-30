@@ -11,7 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 7;
 
 
     // Table for meals
@@ -19,7 +19,6 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ID = "_id";
     private static final String COLUMN_MEAL_NAME = "meal_name";
     private static final String COLUMN_MEAL_DESCRIPTION = "description";
-    private static final String COLUMN_DATE = "meal_date"; // date in milliseconds
 
 
     // Table for ingredients
@@ -29,6 +28,7 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_SKLADNIK = "skladnik";
     private static final String COLUMN_ILOSC = "ilosc";
     private static final String COLUMN_JEDNOSTKA = "jednostka";
+    private static final String COLUMN_KATERGORIA = "kategoria";
 
     // Table for Calendar
     private static final String TABLE_CALENDAR = "Calendar";
@@ -41,53 +41,76 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {;
-
         // Create meals table
-        String CREATE_MEALS_TABLE = "CREATE TABLE " + TABLE_MEALS + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_MEAL_NAME + " TEXT,"
-                + COLUMN_MEAL_DESCRIPTION + " TEXT"
-                + ")";
+    String CREATE_MEALS_TABLE = "CREATE TABLE " + TABLE_MEALS + "("
+            + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_MEAL_NAME + " TEXT,"
+            + COLUMN_MEAL_DESCRIPTION + " TEXT"
+            + ")";
+
+    // Create ingredients table with optional foreign key (meal_id can be NULL)
+    String CREATE_INGREDIENTS_TABLE = "CREATE TABLE " + TABLE_INGREDIENTS + "("
+            + COLUMN_INGREDIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_MEAL_ID + " INTEGER,"
+            + COLUMN_SKLADNIK + " TEXT,"
+            + COLUMN_KATERGORIA + " TEXT,"
+            + COLUMN_ILOSC + " TEXT,"
+            + COLUMN_JEDNOSTKA + " TEXT,"
+            + "FOREIGN KEY(" + COLUMN_MEAL_ID + ") REFERENCES " + TABLE_MEALS + "(" + COLUMN_ID + ") ON DELETE CASCADE"
+            + ")";
+
+    // Create Calendar table
+    // Create calendar table (correcting foreign key reference)
+    String CREATE_CALENDAR_TABLE = "CREATE TABLE " + TABLE_CALENDAR + "("
+            + COLUMN_Calendar_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_MEAL_ID_Foreign + " INTEGER,"
+            + COLUMN_DATE_CALENDAR + " INTEGER,"
+            + "FOREIGN KEY(" + COLUMN_MEAL_ID_Foreign + ") REFERENCES " + TABLE_MEALS + "(" + COLUMN_ID + ") ON DELETE CASCADE"
+            + ")";
+
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_MEALS_TABLE);
-
-        // Create ingredients table with optional foreign key (meal_id can be NULL)
-        String CREATE_INGREDIENTS_TABLE = "CREATE TABLE " + TABLE_INGREDIENTS + "("
-                + COLUMN_INGREDIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_MEAL_ID + " INTEGER,"
-                + COLUMN_SKLADNIK + " TEXT,"
-                + COLUMN_ILOSC + " TEXT,"
-                + COLUMN_JEDNOSTKA + " TEXT,"
-                + "FOREIGN KEY(" + COLUMN_MEAL_ID + ") REFERENCES " + TABLE_MEALS + "(" + COLUMN_ID + ") ON DELETE CASCADE"
-                + ")";
         db.execSQL(CREATE_INGREDIENTS_TABLE);
-
-        // Create Calendar table
-        // Create calendar table (correcting foreign key reference)
-        String CREATE_CALENDAR_TABLE = "CREATE TABLE " + TABLE_CALENDAR + "("
-                + COLUMN_Calendar_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COLUMN_MEAL_ID_Foreign + " INTEGER,"
-                + COLUMN_DATE_CALENDAR + " INTEGER,"
-                + "FOREIGN KEY(" + COLUMN_MEAL_ID_Foreign + ") REFERENCES " + TABLE_MEALS + "(" + COLUMN_ID + ") ON DELETE CASCADE"
-                + ")";
         db.execSQL(CREATE_CALENDAR_TABLE);
+    }
+
+
+
+    public void DeleteAllTablesRecords(){
+        System.out.println("Deleting Database");
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //Delete Tables
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CALENDAR);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
+
+        onCreate(db);
+
+        System.out.println("Deleting Database Completed");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
+
+
+        for (int i = 0; i < 2222; i++) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CALENDAR);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
+        }
         onCreate(db);
     }
 
     // Method to add a meal to the database (meal name with optional date)
-    public long addMeal(String mealName, long dateInMillis, String description) {
+    public long addMeal(String mealName, String description) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_MEAL_NAME, mealName);
         values.put(COLUMN_MEAL_DESCRIPTION, description);
-        //values.put(COLUMN_DATE, null);
 
         // Insert and return the new meal ID
         long mealId = db.insert(TABLE_MEALS, null, values);
@@ -95,12 +118,24 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         return mealId;
     }
 
+    public Cursor getAllIngridents(int mealId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to join meals and calendar tables
+        String query = "SELECT " +
+                COLUMN_INGREDIENT_ID + ", " +
+                COLUMN_SKLADNIK + ", " +
+                COLUMN_ILOSC + ", " +
+                COLUMN_JEDNOSTKA + ", " +
+                COLUMN_KATERGORIA +
+                " FROM " + TABLE_INGREDIENTS +
+                " WHERE " + COLUMN_MEAL_ID + " = ?";
+
+        // Execute the query, passing the mealId as a parameter
+        return db.rawQuery(query, new String[]{String.valueOf(mealId)});
+    }
+
     public void deleteMeal(long mealId) {
-
-        for (int i = 0; i < 100; i++) {
-            System.out.println(mealId);
-        }
-
         SQLiteDatabase db = this.getWritableDatabase();
 
         // First, delete all ingredients associated with the meal (if needed)
@@ -200,5 +235,49 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         db.close();  // Close the database connection after update
         return rowsAffected;
     }
+
+
+
+    public void addIngredient(String skladnik, String ilosc, String jednostka, String kategoria,
+                              String MealID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_SKLADNIK, skladnik);
+        values.put(COLUMN_ILOSC, ilosc);
+        values.put(COLUMN_JEDNOSTKA, jednostka);
+        values.put(COLUMN_KATERGORIA, kategoria);
+        values.put(COLUMN_MEAL_ID, MealID);
+
+
+        // Insert and return the new meal ID
+        db.insert(TABLE_INGREDIENTS, null, values);
+        db.close();
+    }
+
+    public void printAllIngredients() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_INGREDIENTS, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(COLUMN_INGREDIENT_ID));
+                String skladnik = cursor.getString(cursor.getColumnIndex(COLUMN_SKLADNIK));
+                String ilosc = cursor.getString(cursor.getColumnIndex(COLUMN_ILOSC));
+                String jednostka = cursor.getString(cursor.getColumnIndex(COLUMN_JEDNOSTKA));
+                String kategoria = cursor.getString(cursor.getColumnIndex(COLUMN_KATERGORIA));
+                String MealID = cursor.getString(cursor.getColumnIndex(COLUMN_MEAL_ID));
+/*
+                // Print each ingredient's details
+                System.out.println("ID: " + id + ", Skladnik: " + skladnik + ", Ilosc: " + ilosc +
+                        ", Jednostka: " + jednostka + ", Kategoria: " + kategoria + "COLUMN_MEAL_ID " +
+                        "= " + MealID);
+*/
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+    }
+
 
 }

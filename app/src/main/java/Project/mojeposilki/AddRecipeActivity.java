@@ -48,7 +48,7 @@ public class AddRecipeActivity extends AppCompatActivity {
 
     private void addNewProduct() {
         // Create a new empty product and add to the list
-        productList.add(new Product("", "", ""));
+        productList.add(new Product("", "", "", ""));
         productAdapter.notifyItemInserted(productList.size() - 1);
     }
 
@@ -68,7 +68,8 @@ public class AddRecipeActivity extends AppCompatActivity {
         // Validate each product (ingredient)
         for (int i = 0; i < productList.size(); i++) {
             Product product = productList.get(i);
-            if (product.getSkladnik().isEmpty() || product.getIlosc().isEmpty() || product.getJednostka().isEmpty()) {
+            if (product.getSkladnik().isEmpty() || product.getIlosc().isEmpty() ||
+                    product.getJednostka().isEmpty() || product.getKategoria().isEmpty() ) {
                 Toast.makeText(this, "Please fill out all fields for each ingredient", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -79,16 +80,20 @@ public class AddRecipeActivity extends AppCompatActivity {
             }
         }
 
-
         // Zapisanie przepisu do bazy danych
         MealDatabaseHelper dbHelper = new MealDatabaseHelper(this);
-        long currentTimeMillis = System.currentTimeMillis(); // Możesz użyć tej wartości jako daty
 
         // Zapisujemy samą nazwę przepisu z datą
-        dbHelper.addMeal(recipeName, currentTimeMillis, descriptionFormated);
+        long MealID = dbHelper.addMeal(recipeName, descriptionFormated);
+
 
         // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
-        // ...
+        for (int i = 0; i < productList.size(); i++) {
+            Product product = productList.get(i);
+            dbHelper.addIngredient(product.getSkladnik(), product.getIlosc(),  product.getJednostka(),
+                    product.getKategoria(), Long.toString(MealID));
+        }
+
 
         Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
 

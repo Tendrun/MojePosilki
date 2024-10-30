@@ -61,6 +61,9 @@ public class ViewMealsActivity extends AppCompatActivity {
                 showMealOptionsDialog(mealId);
             }
         });
+
+        mealDatabaseHelper.printAllIngredients();
+
     }
 
     // Load meals based on selected sorting option
@@ -148,6 +151,9 @@ public class ViewMealsActivity extends AppCompatActivity {
 
         // Helper method to format the date from milliseconds to a readable format (e.g., DD-MM-YYYY)
         private String formatDate(long millis) {
+            if (millis == 0){
+                return "";
+            }
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
             Date resultDate = new Date(millis);
             return sdf.format(resultDate);

@@ -38,6 +38,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.skladnikField.setText(product.getSkladnik());
         holder.iloscField.setText(product.getIlosc());
         holder.jednostkaField.setText(product.getJednostka());
+        holder.KategoriaField.setText(product.getKategoria());
 
         // Add TextWatchers to update Product object when the user types
         holder.skladnikField.addTextChangedListener(new SimpleTextWatcher() {
@@ -61,6 +62,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
         });
 
+        holder.KategoriaField.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                product.setKategoria(s.toString());
+            }
+        });
+
         holder.deleteProductButton.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(holder.getAdapterPosition()));
     }
 
@@ -70,7 +78,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
-        EditText skladnikField, iloscField, jednostkaField;
+        EditText skladnikField, iloscField, jednostkaField, KategoriaField;
         Button deleteProductButton;
 
         public ProductViewHolder(@NonNull View itemView) {
@@ -78,6 +86,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             skladnikField = itemView.findViewById(R.id.skladnikField);
             iloscField = itemView.findViewById(R.id.iloscField);
             jednostkaField = itemView.findViewById(R.id.jednostkaField);
+            KategoriaField = itemView.findViewById(R.id.KategoriaField);
             deleteProductButton = itemView.findViewById(R.id.deleteProductButton);
         }
     }

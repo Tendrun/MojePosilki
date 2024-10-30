@@ -5,7 +5,9 @@ public class Product {
     private String ilosc;
     private String jednostka;
 
-    public Product(String skladnik, String ilosc, String jednostka) {
+    private String Kategoria;
+
+    public Product(String skladnik, String ilosc, String jednostka, String Kategoria) {
         this.skladnik = skladnik;
         this.ilosc = ilosc;
         this.jednostka = jednostka;
@@ -21,6 +23,14 @@ public class Product {
 
     public String getIlosc() {
         return ilosc;
+    }
+
+    public String getKategoria() {
+        return ilosc;
+    }
+
+    public void setKategoria(String Kategoria) {
+        this.Kategoria = Kategoria;
     }
 
     public void setIlosc(String ilosc) {
