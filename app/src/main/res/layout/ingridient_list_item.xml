@@ -4,39 +4,57 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:gravity="center_vertical">
 
     <!-- Ingredient Name -->
     <TextView
         android:id="@+id/tv_meal_name"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="143dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="Ingredient Name"
-        android:textSize="16sp"/>
+        android:textColor="#000000"
+        android:textSize="16sp" />
 
     <!-- Mark as Bought Button -->
-    <Button
-        android:id="@+id/btn_mark_bought"
+    <CheckBox
+        android:id="@+id/btn_mark_athome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bought"
-        android:background="?android:attr/selectableItemBackground" />
+        android:clickable="true"
+        android:focusable="true"
+        android:text="At Home" />
+
 
     <!-- Plus Button -->
+    <CheckBox
+        android:id="@+id/btn_mark_bought"
+        android:layout_width="126dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="Bought" />
+
     <Button
         android:id="@+id/btn_add_ingredient"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:text="+"
-        android:background="?android:attr/selectableItemBackground" />
+        android:layout_marginStart="8dp"
+        android:backgroundTint="#FF6200EE"
+        android:textColor="#FFFFFF"
+        android:padding="4dp" />
 
     <!-- Minus Button -->
     <Button
         android:id="@+id/btn_delete_ingredient"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:text="-"
-        android:background="?android:attr/selectableItemBackground" />
-
+        android:layout_marginStart="8dp"
+        android:backgroundTint="#FF6200EE"
+        android:textColor="#FFFFFF"
+        android:padding="4dp" />
 </LinearLayout>

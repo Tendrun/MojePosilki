@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.AdapterView;
@@ -141,15 +142,45 @@ public class IngredientsCalendar extends AppCompatActivity {
             Button btnAddIngredient = view.findViewById(R.id.btn_add_ingredient);
             Button btnDeleteIngredient = view.findViewById(R.id.btn_delete_ingredient);
 
+            long ingredientId = cursor.getLong(cursor.getColumnIndex("_id"));
+
+
+
+
+            // In the adapter's bindView or getView method:
+            CheckBox checkBoxBought = view.findViewById(R.id.btn_mark_bought);
+
+            // Get the ingredient ID and bought status from the cursor
+            boolean isBought = mealDatabaseHelper.isIngredientBought(ingredientId);
+
+            // Set checkbox state
+            checkBoxBought.setChecked(isBought);
+
+            // Update database when checkbox is toggled
+            checkBoxBought.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                mealDatabaseHelper.setIngredientBought(ingredientId, isChecked);
+            });
+
+
+
+
+            CheckBox checkAtHome = view.findViewById(R.id.btn_mark_athome);
+
+            // Get the ingredient ID and bought status from the cursor
+            boolean isAtHome = mealDatabaseHelper.isIngredientAtHome(ingredientId);
+
+            // Set checkbox state
+            checkAtHome.setChecked(isAtHome);
+
+            // Update database when checkbox is toggled
+            checkAtHome.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                mealDatabaseHelper.setIngredientAtHome(ingredientId, isChecked);
+            });
+
+
             // Set ingredient name
             String skladnik = cursor.getString(cursor.getColumnIndex("skladnik"));
             skladnikTextView.setText(skladnik);
-
-            // Set click listeners for buttons
-            btnMarkBought.setOnClickListener(v -> {
-                // Logic to mark as bought (for future implementation)
-                Toast.makeText(context, skladnik + " marked as bought", Toast.LENGTH_SHORT).show();
-            });
 
             btnAddIngredient.setOnClickListener(v -> {
                 // Navigate to AddRecipeActivity
@@ -159,10 +190,13 @@ public class IngredientsCalendar extends AppCompatActivity {
 
             btnDeleteIngredient.setOnClickListener(v -> {
                 // Get the ingredient ID and delete it (for future implementation)
-                int ingredientId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                //int ingredientId = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
                 Toast.makeText(context, "Delete ingredient with ID: " + ingredientId, Toast.LENGTH_SHORT).show();
+                mealDatabaseHelper.deleteIngredientById(ingredientId);
+                loadIngredientsForDateAndCategory();
             });
         }
+
 
     }
 }

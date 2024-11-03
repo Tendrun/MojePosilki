@@ -11,7 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 11;
 
 
     // Table for meals
@@ -29,6 +29,9 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ILOSC = "ilosc";
     private static final String COLUMN_JEDNOSTKA = "jednostka";
     private static final String COLUMN_KATERGORIA = "kategoria";
+    private static final String COLUMN_IS_BOUGHT = "is_bought";
+    private static final String COLUMN_AT_HOME = "is_at_home";
+
 
     // Table for Calendar
     private static final String TABLE_CALENDAR = "Calendar";
@@ -49,6 +52,9 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
             + ")";
 
     // Create ingredients table with optional foreign key (meal_id can be NULL)
+    // New column to track if the ingredient is bought
+
+    // Update the CREATE_INGREDIENTS_TABLE with the new column
     String CREATE_INGREDIENTS_TABLE = "CREATE TABLE " + TABLE_INGREDIENTS + "("
             + COLUMN_INGREDIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_MEAL_ID + " INTEGER,"
@@ -56,8 +62,11 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_KATERGORIA + " TEXT,"
             + COLUMN_ILOSC + " TEXT,"
             + COLUMN_JEDNOSTKA + " TEXT,"
+            + COLUMN_AT_HOME + " INTEGER DEFAULT 0,"  // New column with default unchecked state
+            + COLUMN_IS_BOUGHT + " INTEGER DEFAULT 0,"  // New column with default unchecked state
             + "FOREIGN KEY(" + COLUMN_MEAL_ID + ") REFERENCES " + TABLE_MEALS + "(" + COLUMN_ID + ") ON DELETE CASCADE"
             + ")";
+
 
     // Create Calendar table
     // Create calendar table (correcting foreign key reference)
@@ -78,7 +87,7 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
 
 
-    public void DeleteAllTablesRecords(){
+    public void DeleteAllTables(){
         System.out.println("Deleting Database");
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -95,13 +104,6 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-
-        for (int i = 0; i < 2222; i++) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_CALENDAR);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
-        }
         onCreate(db);
     }
 
@@ -297,5 +299,53 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, selectionArgs);
     }
 
+    // Method to delete an ingredient by its ID
+    public void deleteIngredientById(long ingredientId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Delete the ingredient by ID
+        db.delete(TABLE_INGREDIENTS, COLUMN_INGREDIENT_ID + "=?", new String[]{String.valueOf(ingredientId)});
+
+        db.close(); // Close the database connection after deletion
+        System.out.println("Ingredient with ID " + ingredientId + " has been deleted.");
+    }
+
+    // Get checkbox state for a specific ingredient ID
+    public boolean isIngredientBought(long ingredientId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_IS_BOUGHT + " FROM " + TABLE_INGREDIENTS + " WHERE " + COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredientId)});
+        boolean isBought = false;
+        if (cursor.moveToFirst()) {
+            isBought = cursor.getInt(cursor.getColumnIndex(COLUMN_IS_BOUGHT)) == 1;
+        }
+        cursor.close();
+        return isBought;
+    }
+
+    // Set checkbox state for a specific ingredient ID
+    public void setIngredientBought(long ingredientId, boolean isBought) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_IS_BOUGHT, isBought ? 1 : 0);
+        db.update(TABLE_INGREDIENTS, values, COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredientId)});
+    }
+
+    public boolean isIngredientAtHome(long ingredientId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + COLUMN_AT_HOME + " FROM " + TABLE_INGREDIENTS + " WHERE " + COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredientId)});
+        boolean AtHome = false;
+        if (cursor.moveToFirst()) {
+            AtHome = cursor.getInt(cursor.getColumnIndex(COLUMN_AT_HOME)) == 1;
+        }
+        cursor.close();
+        return AtHome;
+    }
+
+    public void setIngredientAtHome(long ingredientId, boolean AtHome) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_AT_HOME, AtHome ? 1 : 0);
+        db.update(TABLE_INGREDIENTS, values, COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredientId)});
+    }
 
 }
