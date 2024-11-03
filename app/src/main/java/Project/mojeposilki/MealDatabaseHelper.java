@@ -11,7 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
 
     // Table for meals
@@ -104,6 +104,11 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CALENDAR);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
+
+
         onCreate(db);
     }
 
