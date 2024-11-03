@@ -35,5 +35,9 @@
             android:name=".ModifyMealActivity">
         </activity>
 
+        <activity
+            android:name=".IngredientsCalendar">
+        </activity>
+
     </application>
 </manifest>

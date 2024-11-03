@@ -82,7 +82,6 @@ public class CalendarActivity extends AppCompatActivity {
 
         // Handle adding meal logic with date here
         MealDatabaseHelper dbHelper = new MealDatabaseHelper(this);
-        //TODO
         dbHelper.addMealToCalendar(mealId, calendar.getTimeInMillis());
 
         Toast.makeText(this, "Meal added to calendar", Toast.LENGTH_SHORT).show();

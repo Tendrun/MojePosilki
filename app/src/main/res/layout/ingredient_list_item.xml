@@ -5,10 +5,16 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <EditText
-        android:id="@+id/ingredientEditText"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_ingredient_id"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Ingredient"
-        android:inputType="text" />
+        android:text="ID"
+        android:paddingEnd="16dp"/>
+
+    <TextView
+        android:id="@+id/tv_skladnik"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ingredient" />
 </LinearLayout>

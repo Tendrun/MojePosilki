@@ -92,6 +92,8 @@ public class AddRecipeActivity extends AppCompatActivity {
             Product product = productList.get(i);
             dbHelper.addIngredient(product.getSkladnik(), product.getIlosc(),  product.getJednostka(),
                     product.getKategoria(), Long.toString(MealID));
+            System.out.println("product.getKategoria()" + product.getKategoria());
+
         }
 
 

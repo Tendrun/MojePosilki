@@ -26,7 +26,7 @@ public class Product {
     }
 
     public String getKategoria() {
-        return ilosc;
+        return Kategoria;
     }
 
     public void setKategoria(String Kategoria) {

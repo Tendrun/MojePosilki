@@ -118,22 +118,12 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         return mealId;
     }
 
-    public Cursor getAllIngridents(int mealId) {
+    public Cursor getAllIngredients() {
         SQLiteDatabase db = this.getReadableDatabase();
-
-        // Query to join meals and calendar tables
-        String query = "SELECT " +
-                COLUMN_INGREDIENT_ID + ", " +
-                COLUMN_SKLADNIK + ", " +
-                COLUMN_ILOSC + ", " +
-                COLUMN_JEDNOSTKA + ", " +
-                COLUMN_KATERGORIA +
-                " FROM " + TABLE_INGREDIENTS +
-                " WHERE " + COLUMN_MEAL_ID + " = ?";
-
-        // Execute the query, passing the mealId as a parameter
-        return db.rawQuery(query, new String[]{String.valueOf(mealId)});
+        String query = "SELECT * FROM " + TABLE_INGREDIENTS;
+        return db.rawQuery(query, null);
     }
+
 
     public void deleteMeal(long mealId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -277,6 +267,34 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         db.close();
+    }
+
+    // Method to get all ingredients for meals on a specific date
+    public Cursor getIngredientsByDate(long dateInMillis, String category) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query;
+        String[] selectionArgs;
+
+        if ("All Categories".equals(category)) {
+            // If "All Categories" is selected, exclude category filter
+            query = "SELECT i." + COLUMN_INGREDIENT_ID + ", i." + COLUMN_SKLADNIK + ", i." + COLUMN_KATERGORIA +
+                    " FROM " + TABLE_INGREDIENTS + " i" +
+                    " JOIN " + TABLE_CALENDAR + " c ON i." + COLUMN_MEAL_ID + " = c." + COLUMN_MEAL_ID_Foreign +
+                    " WHERE c." + COLUMN_DATE_CALENDAR + " = ?";
+            selectionArgs = new String[] { String.valueOf(dateInMillis) };
+        } else {
+            // Filter by the hardcoded "Meat" category
+            query = "SELECT i." + COLUMN_INGREDIENT_ID + ", i." + COLUMN_SKLADNIK + ", i." + COLUMN_KATERGORIA +
+                    " FROM " + TABLE_INGREDIENTS + " i" +
+                    " JOIN " + TABLE_CALENDAR + " c ON i." + COLUMN_MEAL_ID + " = c." + COLUMN_MEAL_ID_Foreign +
+                    " WHERE c." + COLUMN_DATE_CALENDAR + " = ?" +
+                    " AND TRIM(i." + COLUMN_KATERGORIA + ") = ? COLLATE NOCASE";
+            selectionArgs = new String[] { String.valueOf(dateInMillis), category };
+            System.out.println("QUERY WITH HARD-CODED CATEGORY: " + query);
+        }
+
+        return db.rawQuery(query, selectionArgs);
     }
 
 
