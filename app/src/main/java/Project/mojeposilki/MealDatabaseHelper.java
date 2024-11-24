@@ -11,7 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 14;
 
 
     // Table for meals
@@ -31,6 +31,13 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_KATERGORIA = "kategoria";
     private static final String COLUMN_IS_BOUGHT = "is_bought";
     private static final String COLUMN_AT_HOME = "is_at_home";
+    private static final String COLUMN_CALORIES = "calories";
+    private static final String COLUMN_PROTEIN = "protein";
+    private static final String COLUMN_FATS = "fats";
+    private static final String COLUMN_CARBOHYDRATES = "carbohydrates";
+
+
+
 
 
     // Table for Calendar
@@ -62,6 +69,10 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_KATERGORIA + " TEXT,"
             + COLUMN_ILOSC + " TEXT,"
             + COLUMN_JEDNOSTKA + " TEXT,"
+            + COLUMN_FATS + " TEXT,"
+            + COLUMN_CARBOHYDRATES + " TEXT,"
+            + COLUMN_PROTEIN + " TEXT,"
+            + COLUMN_CALORIES + " TEXT,"
             + COLUMN_AT_HOME + " INTEGER DEFAULT 0,"  // New column with default unchecked state
             + COLUMN_IS_BOUGHT + " INTEGER DEFAULT 0,"  // New column with default unchecked state
             + "FOREIGN KEY(" + COLUMN_MEAL_ID + ") REFERENCES " + TABLE_MEALS + "(" + COLUMN_ID + ") ON DELETE CASCADE"
@@ -236,19 +247,30 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
 
     public void addIngredient(String skladnik, String ilosc, String jednostka, String kategoria,
-                              String MealID) {
+            String fat, String carbo, String protein, String MealID) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_SKLADNIK, skladnik);
         values.put(COLUMN_ILOSC, ilosc);
         values.put(COLUMN_JEDNOSTKA, jednostka);
         values.put(COLUMN_KATERGORIA, kategoria);
+        values.put(COLUMN_FATS, fat);
+        values.put(COLUMN_CARBOHYDRATES, carbo);
+        values.put(COLUMN_PROTEIN, protein);
+        values.put(COLUMN_CALORIES, String.valueOf(countCalories(carbo, fat, protein)));
+
         values.put(COLUMN_MEAL_ID, MealID);
 
 
         // Insert and return the new meal ID
         db.insert(TABLE_INGREDIENTS, null, values);
         db.close();
+    }
+
+    int countCalories(String carbo, String fat, String protein){
+        System.out.println("carbo " + carbo + " fat " + " protein " + protein);
+        return Integer.parseInt(carbo) * 4 + Integer.parseInt(fat) * 8
+                + Integer.parseInt(protein) * 4;
     }
 
     public void printAllIngredients() {
@@ -304,16 +326,78 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, selectionArgs);
     }
 
+    public Cursor getNutritionalInfoCursorByDate(long dateInMillis) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT i." + COLUMN_INGREDIENT_ID + " AS _id, " +
+                "SUM(i." + COLUMN_CALORIES + ") AS total_calories, " +
+                "SUM(i." + COLUMN_PROTEIN + ") AS total_protein, " +
+                "SUM(i." + COLUMN_FATS + ") AS total_fats, " +
+                "SUM(i." + COLUMN_CARBOHYDRATES + ") AS total_carbohydrates " +
+                "FROM " + TABLE_INGREDIENTS + " i " +
+                "JOIN " + TABLE_CALENDAR + " c ON i." + COLUMN_MEAL_ID + " = c." + COLUMN_MEAL_ID_Foreign + " " +
+                "WHERE c." + COLUMN_DATE_CALENDAR + " = ?";
+
+        return db.rawQuery(query, new String[]{String.valueOf(dateInMillis)});
+    }
+
+    public void deleteMealAndRelatedData(long mealId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            db.beginTransaction(); // Start transaction for safe operations
+
+            // Delete all related entries in the Calendar table
+            int calendarRowsDeleted = db.delete(TABLE_CALENDAR, COLUMN_MEAL_ID_Foreign + "=?", new String[]{String.valueOf(mealId)});
+            System.out.println("Deleted " + calendarRowsDeleted + " entries from Calendar table.");
+
+            // Delete all related entries in the Ingredients table
+            int ingredientRowsDeleted = db.delete(TABLE_INGREDIENTS, COLUMN_MEAL_ID + "=?", new String[]{String.valueOf(mealId)});
+            System.out.println("Deleted " + ingredientRowsDeleted + " ingredients associated with meal ID " + mealId);
+
+            db.setTransactionSuccessful(); // Commit transaction
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception for debugging
+        } finally {
+            db.endTransaction(); // End transaction
+            db.close(); // Close database
+        }
+    }
+
+
     // Method to delete an ingredient by its ID
     public void deleteIngredientById(long ingredientId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Delete the ingredient by ID
-        db.delete(TABLE_INGREDIENTS, COLUMN_INGREDIENT_ID + "=?", new String[]{String.valueOf(ingredientId)});
+        try {
+            db.beginTransaction(); // Start a transaction for safe operation
 
-        db.close(); // Close the database connection after deletion
-        System.out.println("Ingredient with ID " + ingredientId + " has been deleted.");
+            // Check for related calendar entries
+            String calendarQuery = "SELECT * FROM " + TABLE_CALENDAR + " WHERE " + COLUMN_MEAL_ID_Foreign +
+                    " = (SELECT " + COLUMN_MEAL_ID + " FROM " + TABLE_INGREDIENTS + " WHERE " +
+                    COLUMN_INGREDIENT_ID + " = ?)";
+            Cursor cursor = db.rawQuery(calendarQuery, new String[]{String.valueOf(ingredientId)});
+            if (cursor != null && cursor.moveToFirst()) {
+                // If related rows exist in the Calendar table
+                System.out.println("Found related calendar entries for ingredient ID: " + ingredientId);
+            }
+
+            // Delete the ingredient
+            int rowsDeleted = db.delete(TABLE_INGREDIENTS, COLUMN_INGREDIENT_ID + "=?", new String[]{String.valueOf(ingredientId)});
+            if (rowsDeleted > 0) {
+                System.out.println("Ingredient with ID " + ingredientId + " deleted successfully.");
+            } else {
+                System.out.println("No ingredient found with ID " + ingredientId);
+            }
+
+            db.setTransactionSuccessful(); // Commit the transaction
+        } catch (Exception e) {
+            e.printStackTrace(); // Log any exceptions
+        } finally {
+            db.endTransaction(); // End the transaction
+            db.close(); // Close the database connection
+        }
     }
+
 
     // Get checkbox state for a specific ingredient ID
     public boolean isIngredientBought(long ingredientId) {

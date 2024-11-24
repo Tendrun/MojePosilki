@@ -1,52 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:columnCount="2"
+    android:padding="16dp"
     tools:context=".IngredientsCalendar">
 
-    <!-- Title -->
-
-    <!-- Category Spinner -->
-
     <!-- Date Picker -->
+    <DatePicker
+        android:id="@+id/datePicker"
+        android:layout_width="382dp"
+        android:layout_height="wrap_content"
+        android:layout_row="0"
+        android:layout_column="0"
+        android:layout_columnSpan="2"
+        android:layout_gravity="start" />
 
-    <!-- ListView for displaying meals -->
-
+    <!-- Spinner for Category Selection -->
     <Spinner
         android:id="@+id/spinner_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/lv_meals"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/datePicker"
-        tools:ignore="MissingConstraints" />
+        android:layout_row="1"
+        android:layout_column="0"
+        android:layout_gravity="start"
+        android:layout_marginTop="8dp" />
 
-    <DatePicker
-        android:id="@+id/datePicker"
-        android:layout_width="352dp"
-        android:layout_height="348dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.406"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints" />
+    <!-- Nutritional Summary Row -->
+    <TextView
+        android:id="@+id/tv_total_calories"
+        android:layout_width="207dp"
+        android:layout_height="wrap_content"
+        android:layout_row="2"
+        android:layout_column="0"
+        android:padding="8dp"
+        android:text="Calories: 0"
+        android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/tv_total_protein"
+        android:layout_width="168dp"
+        android:layout_height="wrap_content"
+        android:layout_row="2"
+        android:layout_column="1"
+        android:padding="8dp"
+        android:text="Protein: 0g"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_total_fats"
+        android:layout_width="168dp"
+        android:layout_height="wrap_content"
+        android:layout_row="3"
+        android:layout_column="1"
+        android:padding="8dp"
+        android:text="Fats: 0g"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_total_carbohydrates"
+        android:layout_width="212dp"
+        android:layout_height="wrap_content"
+        android:layout_row="3"
+        android:layout_column="0"
+        android:padding="8dp"
+        android:text="Carbohydrates: 0g"
+        android:textSize="16sp" />
+
+    <!-- Meals List -->
     <ListView
         android:id="@+id/lv_meals"
-        android:layout_width="342dp"
-        android:layout_height="329dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/datePicker"
-        app:layout_constraintVertical_bias="1.0" />
+        android:layout_width="363dp"
+        android:layout_height="12dp"
+        android:layout_row="4"
+        android:layout_columnSpan="2"
+        android:layout_gravity="fill"
+        android:layout_marginTop="16dp" />
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</GridLayout>

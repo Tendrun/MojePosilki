@@ -25,6 +25,9 @@ public class IngredientsCalendar extends AppCompatActivity {
     private Spinner spinnerCategory;
     private MealDatabaseHelper mealDatabaseHelper;
     private IngredientCursorAdapter adapter;
+    private NutritionalSummaryAdapter Nutriadapter;
+    private TextView proteinView,caloriesView,fatsView,carbosView;
+
     private DatePicker datePicker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +72,6 @@ public class IngredientsCalendar extends AppCompatActivity {
                 String kategoria = cursor.getString(cursor.getColumnIndexOrThrow("kategoria"));
                 String ilosc = cursor.getString(cursor.getColumnIndexOrThrow("ilosc"));
                 String jednostka = cursor.getString(cursor.getColumnIndexOrThrow("jednostka"));
-
-                System.out.println("Ingredient ID: " + id);
-                System.out.println("Ingredient Name: " + skladnik);
-                System.out.println("Category: " + kategoria);
-                System.out.println("Quantity: " + ilosc);
-                System.out.println("Unit: " + jednostka);
-                System.out.println("---------------");
             }
             cursor.close();
         }
@@ -92,6 +88,38 @@ public class IngredientsCalendar extends AppCompatActivity {
 
         String selectedCategory = spinnerCategory.getSelectedItem().toString();
         long dateInMillis = calendar.getTimeInMillis();
+
+        // Get callories from this day
+
+        Cursor cursor_calories = mealDatabaseHelper.getNutritionalInfoCursorByDate(dateInMillis);
+
+        if (cursor_calories != null && cursor_calories.moveToFirst()) {
+            do {
+                // Retrieve each column's value
+                int ingredientId = cursor_calories.getInt(cursor_calories.getColumnIndexOrThrow("_id"));
+                int totalCalories = cursor_calories.getInt(cursor_calories.getColumnIndexOrThrow("total_calories"));
+                int totalProtein = cursor_calories.getInt(cursor_calories.getColumnIndexOrThrow("total_protein"));
+                int totalFats = cursor_calories.getInt(cursor_calories.getColumnIndexOrThrow("total_fats"));
+                int totalCarbohydrates = cursor_calories.getInt(cursor_calories.getColumnIndexOrThrow("total_carbohydrates"));
+
+                TextView tvTotalCalories = findViewById(R.id.tv_total_calories);
+                TextView tvTotalProtein = findViewById(R.id.tv_total_protein);
+                TextView tvTotalFats = findViewById(R.id.tv_total_fats);
+                TextView tvTotalCarbohydrates = findViewById(R.id.tv_total_carbohydrates);
+
+                // Set values to TextViews
+                tvTotalCalories.setText("Total Calories " + String.valueOf(totalCalories));
+                tvTotalProtein.setText("Total Protein " + String.valueOf(totalProtein));
+                tvTotalFats.setText("Total Fats " + String.valueOf(totalFats));
+                tvTotalCarbohydrates.setText("Total Carbohydrates " + String.valueOf(totalCarbohydrates));
+
+                // Close the cursor
+                cursor_calories.close();
+
+            } while (cursor_calories.moveToNext()); // Move to the next row
+
+            cursor_calories.close(); // Always close the Cursor after use
+        }
 
         // Fetch ingredients from the database
         Cursor cursor = mealDatabaseHelper.getIngredientsByDate(dateInMillis, selectedCategory);
@@ -199,4 +227,42 @@ public class IngredientsCalendar extends AppCompatActivity {
 
 
     }
+    public class NutritionalSummaryAdapter extends android.widget.SimpleCursorAdapter  {
+
+        public NutritionalSummaryAdapter(Context context, Cursor c, int flags) {
+            super(context, R.layout.ingridient_list_item, c, new String[]{
+                    "total_calories",
+                    "total_protein",
+                    "total_fats",
+                    "total_carbohydrates"
+            }, new int[]{
+                    R.id.tv_total_calories,
+                    R.id.tv_total_protein,
+                    R.id.tv_total_fats,
+                    R.id.tv_total_carbohydrates
+            }, flags);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            // Find views in the layout
+            TextView totalCaloriesTextView = view.findViewById(R.id.tv_total_calories);
+            TextView totalProteinTextView = view.findViewById(R.id.tv_total_protein);
+            TextView totalFatsTextView = view.findViewById(R.id.tv_total_fats);
+            TextView totalCarbohydratesTextView = view.findViewById(R.id.tv_total_carbohydrates);
+
+            // Extract values from the cursor
+            int totalCalories = cursor.getInt(cursor.getColumnIndex("total_calories"));
+            int totalProtein = cursor.getInt(cursor.getColumnIndex("total_protein"));
+            int totalFats = cursor.getInt(cursor.getColumnIndex("total_fats"));
+            int totalCarbohydrates = cursor.getInt(cursor.getColumnIndex("total_carbohydrates"));
+
+            // Bind data to the views
+            totalCaloriesTextView.setText(String.valueOf(totalCalories));
+            totalProteinTextView.setText(String.valueOf(totalProtein));
+            totalFatsTextView.setText(String.valueOf(totalFats));
+            totalCarbohydratesTextView.setText(String.valueOf(totalCarbohydrates));
+        }
+    }
+
 }

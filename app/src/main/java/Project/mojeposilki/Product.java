@@ -7,10 +7,18 @@ public class Product {
 
     private String Kategoria;
 
-    public Product(String skladnik, String ilosc, String jednostka, String Kategoria) {
+    private String protein;
+    private String carbohydrates;
+    private String fats;
+
+    public Product(String skladnik, String ilosc, String jednostka, String Kategoria,
+                   String protein, String carbohydrates, String fats) {
         this.skladnik = skladnik;
         this.ilosc = ilosc;
         this.jednostka = jednostka;
+        this.fats = fats;
+        this.protein = protein;
+        this.carbohydrates = carbohydrates;
     }
 
     public String getSkladnik() {
@@ -43,6 +51,30 @@ public class Product {
 
     public void setJednostka(String jednostka) {
         this.jednostka = jednostka;
+    }
+
+    public String getProtein() {
+        return protein;
+    }
+
+    public void setProtein(String protein) {
+        this.protein = protein;
+    }
+
+    public String getcarbohydrates() {
+        return carbohydrates;
+    }
+
+    public void setcarbohydrates(String carbohydrates) {
+        this.carbohydrates = carbohydrates;
+    }
+
+    public String getfats() {
+        return fats;
+    }
+
+    public void setfats(String fats) {
+        this.fats = fats;
     }
 }
 

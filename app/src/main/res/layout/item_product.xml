@@ -1,41 +1,81 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
 
-    <EditText
-        android:id="@+id/skladnikField"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:hint="Składnik" />
 
-    <EditText
-        android:id="@+id/iloscField"
-        android:layout_width="0dp"
+    <GridLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:hint="Ilość"
-        android:inputType="numberDecimal" />
+        android:orientation="vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditText
-        android:id="@+id/jednostkaField"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:hint="Jednostka" />
 
-    <EditText
-        android:id="@+id/KategoriaField"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:hint="Kategoria" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="79dp"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
-    <Button
-        android:id="@+id/deleteProductButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="X" />
-</LinearLayout>
+            <EditText
+                android:id="@+id/skladnikField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="Składnik" />
+
+            <EditText
+                android:id="@+id/iloscField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Ilość"
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/jednostkaField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Jednostka" />
+
+            <EditText
+                android:id="@+id/KategoriaField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Kategoria" />
+
+            <Button
+                android:id="@+id/deleteProductButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <EditText
+                android:id="@+id/protein"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="protein" />
+
+            <EditText
+                android:id="@+id/carbohydrates"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="carbohydrates"
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/fats"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="fats"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+    </GridLayout>

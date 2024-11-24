@@ -48,7 +48,8 @@ public class AddRecipeActivity extends AppCompatActivity {
 
     private void addNewProduct() {
         // Create a new empty product and add to the list
-        productList.add(new Product("", "", "", ""));
+        productList.add(new Product("", "", "", "", "",
+                "", ""));
         productAdapter.notifyItemInserted(productList.size() - 1);
     }
 
@@ -91,7 +92,9 @@ public class AddRecipeActivity extends AppCompatActivity {
         for (int i = 0; i < productList.size(); i++) {
             Product product = productList.get(i);
             dbHelper.addIngredient(product.getSkladnik(), product.getIlosc(),  product.getJednostka(),
-                    product.getKategoria(), Long.toString(MealID));
+                    product.getKategoria(), product.getfats(), product.getcarbohydrates(),
+                    product.getProtein(), Long.toString(MealID));
+
             System.out.println("product.getKategoria()" + product.getKategoria());
 
         }

@@ -17,13 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="221dp"
         android:ems="10"
+        android:hint="Opis i wlasne uwagi do przepisu"
         android:gravity="start|top"
         android:inputType="textMultiLine" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/productRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/addProductButton"
@@ -36,4 +32,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save Recipe" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbarSize="12sp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/productRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
+
 </LinearLayout>

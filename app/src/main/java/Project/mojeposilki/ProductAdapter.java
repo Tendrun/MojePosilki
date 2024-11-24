@@ -39,6 +39,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.iloscField.setText(product.getIlosc());
         holder.jednostkaField.setText(product.getJednostka());
         holder.KategoriaField.setText(product.getKategoria());
+        holder.ProteinField.setText(product.getProtein());
+        holder.FatsField.setText(product.getfats());
+        holder.carbohydratesField.setText(product.getcarbohydrates());
+
 
         // Add TextWatchers to update Product object when the user types
         holder.skladnikField.addTextChangedListener(new SimpleTextWatcher() {
@@ -69,6 +73,27 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
         });
 
+        holder.FatsField.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                product.setfats(s.toString());
+            }
+        });
+
+        holder.ProteinField.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                product.setProtein(s.toString());
+            }
+        });
+
+        holder.carbohydratesField.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                product.setcarbohydrates(s.toString());
+            }
+        });
+
         holder.deleteProductButton.setOnClickListener(v -> onDeleteClickListener.onDeleteClick(holder.getAdapterPosition()));
     }
 
@@ -78,7 +103,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
-        EditText skladnikField, iloscField, jednostkaField, KategoriaField;
+        EditText skladnikField, iloscField, jednostkaField, KategoriaField, ProteinField, FatsField,
+                carbohydratesField;
         Button deleteProductButton;
 
         public ProductViewHolder(@NonNull View itemView) {
@@ -88,6 +114,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             jednostkaField = itemView.findViewById(R.id.jednostkaField);
             KategoriaField = itemView.findViewById(R.id.KategoriaField);
             deleteProductButton = itemView.findViewById(R.id.deleteProductButton);
+
+            ProteinField = itemView.findViewById(R.id.protein);
+            FatsField = itemView.findViewById(R.id.fats);
+            carbohydratesField = itemView.findViewById(R.id.carbohydrates);
         }
     }
 }
