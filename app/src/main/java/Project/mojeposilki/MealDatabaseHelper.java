@@ -168,19 +168,6 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         return calendarId;
     }
 
-    public Cursor getAllMealsDates() {
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        // Query to join meals and calendar tables
-        String query = "SELECT " + TABLE_MEALS + "." + COLUMN_MEAL_NAME + ", "
-                + TABLE_CALENDAR + "." + COLUMN_DATE_CALENDAR
-                + " FROM " + TABLE_CALENDAR
-                + " INNER JOIN " + TABLE_MEALS
-                + " ON " + TABLE_CALENDAR + "." + COLUMN_MEAL_ID_Foreign + " = " + TABLE_MEALS + "." + COLUMN_ID;
-
-        // Return the cursor containing the meal names and dates
-        return db.rawQuery(query, null);
-    }
 
     // Get all meals sorted alphabetically
     // Get all meals sorted alphabetically (A-Z)
@@ -224,17 +211,6 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         return db.query(TABLE_MEALS, null, null, null, null, null, COLUMN_MEAL_NAME + " ASC");
     }
 
-    // Get all meals sorted in reverse alphabetical order (Z-A)
-    public Cursor getAllMealsSortedByNameDesc() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.query(TABLE_MEALS, null, null, null, null, null, COLUMN_MEAL_NAME + " DESC");
-    }
-
-    // Method to retrieve a meal by its ID
-    public Cursor getMealById(long id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.query(TABLE_MEALS, null, "_id = ?", new String[]{String.valueOf(id)}, null, null, null);
-    }
 
     // Method to update a meal in the database
     public int updateMeal(long id, ContentValues values) {
