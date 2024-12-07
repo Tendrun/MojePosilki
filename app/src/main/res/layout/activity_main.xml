@@ -33,4 +33,18 @@
         android:text="Zobacz kalendarz składniki"
         android:layout_marginTop="20dp" />
 
+    <Button
+        android:id="@+id/WeightActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zobacz Wykres Twojej Wagi"
+        android:layout_marginTop="20dp" />
+
+    <Button
+        android:id="@+id/AddWeightActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dodaj Twoją Wage"
+        android:layout_marginTop="20dp" />
+
 </LinearLayout>

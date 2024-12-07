@@ -39,5 +39,13 @@
             android:name=".IngredientsCalendar">
         </activity>
 
+        <activity
+            android:name=".WeightAcitivity">
+        </activity>
+
+        <activity
+            android:name=".AddWeightActivity">
+        </activity>
+
     </application>
 </manifest>

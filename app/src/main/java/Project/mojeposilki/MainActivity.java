@@ -44,5 +44,21 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        findViewById(R.id.WeightActivity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, WeightAcitivity.class);
+                startActivity(intent);
+            }
+        });
+
+        findViewById(R.id.AddWeightActivity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AddWeightActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

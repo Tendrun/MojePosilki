@@ -11,7 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
 
 
     // Table for meals
@@ -45,6 +45,13 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_Calendar_ID = "_id";
     private static final String COLUMN_MEAL_ID_Foreign = "meal_id"; // Optional foreign key, can be null
     private static final String COLUMN_DATE_CALENDAR = "meal_date"; // date in milliseconds
+
+
+    // Table for Weight
+
+    private static final String TABLE_WEIGHT = "Weight";
+    private static final String COLUMN_Weight_ID = "_id";
+    private static final String COLUMN_WEIGHT = "weightKG";
 
     public MealDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -88,12 +95,20 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
             + "FOREIGN KEY(" + COLUMN_MEAL_ID_Foreign + ") REFERENCES " + TABLE_MEALS + "(" + COLUMN_ID + ") ON DELETE CASCADE"
             + ")";
 
+    String CREATE_WEIGHT_TABLE = "CREATE TABLE " + TABLE_WEIGHT + "("
+            + COLUMN_Weight_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," // Unique ID for the weight entry
+            + COLUMN_WEIGHT + " REAL," // Weight in kilograms (use REAL for decimal values)
+            + COLUMN_DATE_CALENDAR + " INTEGER," // Date for the weight entry, stored as milliseconds
+            + "FOREIGN KEY(" + COLUMN_DATE_CALENDAR + ") REFERENCES " + TABLE_CALENDAR + "(" + COLUMN_DATE_CALENDAR + ")"
+            + ")";
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_MEALS_TABLE);
         db.execSQL(CREATE_INGREDIENTS_TABLE);
         db.execSQL(CREATE_CALENDAR_TABLE);
+        db.execSQL(CREATE_WEIGHT_TABLE);
     }
 
 
@@ -411,6 +426,29 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_AT_HOME, AtHome ? 1 : 0);
         db.update(TABLE_INGREDIENTS, values, COLUMN_INGREDIENT_ID + " = ?", new String[]{String.valueOf(ingredientId)});
+    }
+
+    public Cursor getAllWeightRecords() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT " + COLUMN_WEIGHT + ", " + COLUMN_DATE_CALENDAR +
+                " FROM " + TABLE_WEIGHT +
+                " ORDER BY " + COLUMN_DATE_CALENDAR + " ASC", null);
+    }
+
+    public void addWeight(double weight, long dateInMillis) {
+
+        System.out.println("TUTAJJJ");
+        System.out.println(weight + "dateInMillis" + dateInMillis);
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_WEIGHT, weight);  // Foreign key linking to the meals table
+        values.put(COLUMN_DATE_CALENDAR, dateInMillis);  // Store the date in milliseconds
+
+        // Insert and return the new calendar event ID
+        long calendarId = db.insert(TABLE_CALENDAR, null, values);
+        db.close();
     }
 
 }
