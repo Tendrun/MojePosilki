@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -18,9 +19,8 @@ import java.util.Calendar;
 import java.util.List;
 
 public class AddWeightActivity extends AppCompatActivity {
-    private TextInputLayout WeightText;
+    private TextInputLayout WeightTextLayout;
     private Button addWeightButton;
-    private ProductAdapter productAdapter;
 
     private MealDatabaseHelper dbHelper;
     private DatePicker datePicker;
@@ -31,8 +31,10 @@ public class AddWeightActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_weight_activity);
 
-        WeightText = findViewById(R.id.textField);
+        WeightTextLayout = findViewById(R.id.textFieldLayout);
         addWeightButton = findViewById(R.id.addWeightButton);
+        datePicker = findViewById(R.id.datePicker);
+
 
         dbHelper = new MealDatabaseHelper(this);
 
@@ -51,21 +53,17 @@ public class AddWeightActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day, 0, 0, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        String WeightValue = WeightText.toString();
+        String WeightValue = WeightTextLayout.getEditText().getText().toString().trim();
 
         if (WeightValue.isEmpty()) {
             Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        System.out.println("HEERERE");
+        System.out.println("HEERERE " + WeightValue);
         long dateInMillis = calendar.getTimeInMillis();
-        dbHelper.addWeight(Double.parseDouble(WeightText.toString()), dateInMillis);
+        dbHelper.addWeight(Double.parseDouble(WeightValue), dateInMillis);
 
         Toast.makeText(this, "Weight saved to database!", Toast.LENGTH_SHORT).show();
-
-        // Po zapisaniu przepisu przechodzimy do MainActivity
-        Intent intent = new Intent(AddWeightActivity.this, MainActivity.class);
-        startActivity(intent);
     }
 }

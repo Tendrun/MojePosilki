@@ -11,7 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 17;
 
 
     // Table for meals
@@ -103,12 +103,27 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
             + ")";
 
 
+    // Table for Exercises
+    private static final String TABLE_EXERCISES = "exercises";
+    private static final String COLUMN_EXERCISE_ID = "_id";
+    private static final String COLUMN_EXERCISE_TYPE = "exercise_type";
+    private static final String COLUMN_EXERCISE_DATE = "exercise_date"; // Date in milliseconds
+    private static final String COLUMN_CALORIES_BURNED = "calories_burned";
+
+    String CREATE_EXERCISES_TABLE = "CREATE TABLE " + TABLE_EXERCISES + "("
+            + COLUMN_EXERCISE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_EXERCISE_TYPE + " TEXT,"
+            + COLUMN_EXERCISE_DATE + " INTEGER,"
+            + COLUMN_CALORIES_BURNED + " REAL"
+            + ")";
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_MEALS_TABLE);
         db.execSQL(CREATE_INGREDIENTS_TABLE);
         db.execSQL(CREATE_CALENDAR_TABLE);
         db.execSQL(CREATE_WEIGHT_TABLE);
+        db.execSQL(CREATE_EXERCISES_TABLE);
     }
 
 
@@ -133,6 +148,8 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CALENDAR);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_INGREDIENTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEIGHT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISES);
 
 
         onCreate(db);
@@ -446,9 +463,20 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_WEIGHT, weight);  // Foreign key linking to the meals table
         values.put(COLUMN_DATE_CALENDAR, dateInMillis);  // Store the date in milliseconds
 
+        db.insert(TABLE_WEIGHT, null, values);
+
         // Insert and return the new calendar event ID
-        long calendarId = db.insert(TABLE_CALENDAR, null, values);
         db.close();
     }
+
+    public void insertExerciseRecord(String exerciseType, long dateInMillis, double caloriesBurned) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_EXERCISE_TYPE, exerciseType);
+        values.put(COLUMN_EXERCISE_DATE, dateInMillis);
+        values.put(COLUMN_CALORIES_BURNED, caloriesBurned);
+        db.insert(TABLE_EXERCISES, null, values);
+    }
+
 
 }
