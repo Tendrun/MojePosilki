@@ -54,4 +54,18 @@
         android:text="Zobacz spalone kalorie"
         android:layout_marginTop="20dp" />
 
+    <Button
+        android:id="@+id/GoalActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Zobacz Cele"
+        android:layout_marginTop="20dp" />
+
+    <Button
+        android:id="@+id/ExerciseReminder"
+        android:layout_width="262dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Ustaw przypomnienie" />
+
 </LinearLayout>

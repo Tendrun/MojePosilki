@@ -1,0 +1,91 @@
+<!-- res/layout/activity_goals.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_weight_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Weight Goal (kg):"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/et_weight_goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/tv_calorie_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Daily Calorie Goal:"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/et_calorie_goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/tv_protein_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Protein Goal (g):"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/et_protein_goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/tv_fats_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fats Goal (g):"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/et_fats_goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+
+    <TextView
+        android:id="@+id/tv_carbs_goal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Carbohydrates Goal (g):"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/et_carbs_goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+
+    <Button
+        android:id="@+id/btn_save_goals"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Goals"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#FF6200EE"
+        android:textColor="#FFFFFF" />
+</LinearLayout>

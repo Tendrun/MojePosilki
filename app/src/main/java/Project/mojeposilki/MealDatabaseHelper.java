@@ -11,12 +11,14 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 21;
 
 
     // Table for meals
     private static final String TABLE_MEALS = "meals";
     private static final String COLUMN_ID = "_id";
+    private static final String COLUMN_MEAL_TYPE = "meal_type";
+
     private static final String COLUMN_MEAL_NAME = "meal_name";
     private static final String COLUMN_MEAL_DESCRIPTION = "description";
 
@@ -53,14 +55,35 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_Weight_ID = "_id";
     private static final String COLUMN_WEIGHT = "weightKG";
 
+    // Table and Columns for Goals
+    private static final String TABLE_GOALS = "Goals";
+    private static final String COLUMN_GOAL_ID = "goal_ID";
+    private static final String COLUMN_GOAL_DATE = "goal_date"; // Stores date in milliseconds
+    private static final String COLUMN_WEIGHT_GOAL = "weight_goal";
+    private static final String COLUMN_CALORIE_GOAL = "calorie_goal";
+    private static final String COLUMN_PROTEIN_GOAL = "protein_goal";
+    private static final String COLUMN_FATS_GOAL = "fats_goal";
+    private static final String COLUMN_CARBS_GOAL = "carbs_goal";
+
+
     public MealDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
     }
 
-        // Create meals table
+    String CREATE_GOALS_TABLE = "CREATE TABLE " + TABLE_GOALS + " (" +
+            COLUMN_GOAL_ID + " INTEGER PRIMARY KEY, " +
+            COLUMN_GOAL_DATE + " INTEGER, " +
+            COLUMN_WEIGHT_GOAL + " REAL, " +
+            COLUMN_CALORIE_GOAL + " REAL, " +
+            COLUMN_PROTEIN_GOAL + " REAL, " +
+            COLUMN_FATS_GOAL + " REAL, " +
+            COLUMN_CARBS_GOAL + " REAL)";
+
+    // Create meals table
     String CREATE_MEALS_TABLE = "CREATE TABLE " + TABLE_MEALS + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_MEAL_TYPE + " TEXT,"
             + COLUMN_MEAL_NAME + " TEXT,"
             + COLUMN_MEAL_DESCRIPTION + " TEXT"
             + ")";
@@ -124,6 +147,8 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_CALENDAR_TABLE);
         db.execSQL(CREATE_WEIGHT_TABLE);
         db.execSQL(CREATE_EXERCISES_TABLE);
+        db.execSQL(CREATE_GOALS_TABLE);
+
     }
 
 
@@ -150,17 +175,19 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEALS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WEIGHT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_GOALS);
 
 
         onCreate(db);
     }
 
     // Method to add a meal to the database (meal name with optional date)
-    public long addMeal(String mealName, String description) {
+    public long addMeal(String mealName, String description, String mealType) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_MEAL_NAME, mealName);
         values.put(COLUMN_MEAL_DESCRIPTION, description);
+        values.put(COLUMN_MEAL_TYPE, mealType); // Add meal type
 
         // Insert and return the new meal ID
         long mealId = db.insert(TABLE_MEALS, null, values);
@@ -478,5 +505,39 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_EXERCISES, null, values);
     }
 
+    public void writeHealthGoals(double weightGoal, double calorieGoal, double proteinGoal, double fatsGoal, double carbsGoal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_GOAL_ID, 1); // Ensure record index is always 1
+        values.put(COLUMN_WEIGHT_GOAL, weightGoal);
+        values.put(COLUMN_CALORIE_GOAL, calorieGoal);
+        values.put(COLUMN_PROTEIN_GOAL, proteinGoal);
+        values.put(COLUMN_FATS_GOAL, fatsGoal);
+        values.put(COLUMN_CARBS_GOAL, carbsGoal);
+
+        // Replace or insert a single record with ID 1
+        db.insertWithOnConflict(TABLE_GOALS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+    }
+
+    public HealthGoal readHealthGoals() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_GOALS + " WHERE " + COLUMN_GOAL_ID + " = 1";
+        Cursor cursor = db.rawQuery(query, null);
+        HealthGoal goals = null;
+
+        if (cursor.moveToFirst()) {
+            goals = new HealthGoal(
+                    cursor.getFloat(cursor.getColumnIndex(COLUMN_WEIGHT_GOAL)),
+                    cursor.getFloat(cursor.getColumnIndex(COLUMN_CALORIE_GOAL)),
+                    cursor.getFloat(cursor.getColumnIndex(COLUMN_PROTEIN_GOAL)),
+                    cursor.getFloat(cursor.getColumnIndex(COLUMN_FATS_GOAL)),
+                    cursor.getFloat(cursor.getColumnIndex(COLUMN_CARBS_GOAL))
+            );
+        }
+        cursor.close();
+        db.close();
+        return goals;
+    }
 
 }

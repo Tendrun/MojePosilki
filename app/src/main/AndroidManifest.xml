@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+
+
 
     <application
         android:allowBackup="true"
@@ -22,6 +30,8 @@
         </activity>
         <activity android:name=".AddRecipeActivity">
         </activity>
+
+        <receiver android:name=".AlarmReceiver" />
 
         <activity
             android:name=".ViewMealsActivity">
@@ -49,6 +59,14 @@
 
         <activity
             android:name=".ExerciseActivity">
+        </activity>
+
+        <activity
+            android:name=".GoalsActivity">
+        </activity>
+
+        <activity
+            android:name=".ExerciseReminderActivity">
         </activity>
 
     </application>

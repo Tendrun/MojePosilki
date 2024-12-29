@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,8 @@ public class ModifyMealActivity extends AppCompatActivity {
     private ProductAdapter productAdapter;
     private long mealId = -1;  // Default value for new meal
 
+    private Spinner mealTypeSpinner;
+
     private MealDatabaseHelper dbHelper;
 
     @Override
@@ -38,6 +41,8 @@ public class ModifyMealActivity extends AppCompatActivity {
         addProductButton = findViewById(R.id.addProductButton);
         saveRecipeButton = findViewById(R.id.saveRecipeButton);
         description = findViewById(R.id.Description);
+        mealTypeSpinner = findViewById(R.id.spinnerMealType);
+
 
         // Initialize the database helper
         dbHelper = new MealDatabaseHelper(this);
@@ -80,6 +85,8 @@ public class ModifyMealActivity extends AppCompatActivity {
     private void saveRecipe() {
         String descriptionFormated = description.getText().toString().trim();
         String recipeName = recipeNameField.getText().toString().trim();
+        String mealType = mealTypeSpinner.getSelectedItem().toString();
+
         if (recipeName.isEmpty()) {
             recipeNameField.setError("Recipe name cannot be empty");
             return;
@@ -126,7 +133,7 @@ public class ModifyMealActivity extends AppCompatActivity {
         } else {
             // Add a new meal if it's not an edit
             long currentTimeMillis = System.currentTimeMillis();  // Use this as the date
-            mealId = dbHelper.addMeal(recipeName, descriptionFormated);  // Get the new meal ID
+            mealId = dbHelper.addMeal(recipeName, descriptionFormated, mealType);  // Get the new meal ID
             Toast.makeText(this, "Recipe saved to database!", Toast.LENGTH_SHORT).show();
             // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
             for (int i = 0; i < productList.size(); i++) {

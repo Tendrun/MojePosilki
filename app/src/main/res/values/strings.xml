@@ -4,4 +4,11 @@
         <item>A-Z (Alphabetical)</item>
         <item>Z-A (Reverse Alphabetical)</item>
     </string-array>
+    <string-array name="meal_types">
+        <item>Quick Meal</item>
+        <item>Vegetarian</item>
+        <item>Vegan</item>
+        <item>Gluten-Free</item>
+        <item>Other</item>
+    </string-array>
 </resources>

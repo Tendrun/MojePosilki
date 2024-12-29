@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,9 +23,17 @@ public class AddRecipeActivity extends AppCompatActivity {
     private List<Product> productList;
     private ProductAdapter productAdapter;
 
+    private Spinner mealTypeSpinner;
+
+    MealDatabaseHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Zapisanie przepisu do bazy danych
+        dbHelper = new MealDatabaseHelper(this);
+
+
         setContentView(R.layout.activity_add_recipe);
 
         recipeNameField = findViewById(R.id.recipeName);
@@ -32,6 +41,7 @@ public class AddRecipeActivity extends AppCompatActivity {
         addProductButton = findViewById(R.id.addProductButton);
         saveRecipeButton = findViewById(R.id.saveRecipeButton);
         description = findViewById(R.id.Description);
+        mealTypeSpinner = findViewById(R.id.spinnerMealType);
 
 
         // Initialize product list and adapter
@@ -61,6 +71,8 @@ public class AddRecipeActivity extends AppCompatActivity {
     private void saveRecipe() {
         String recipeName = recipeNameField.getText().toString().trim();
         String descriptionFormated = description.getText().toString().trim();
+        String mealType = mealTypeSpinner.getSelectedItem().toString();
+
         if (recipeName.isEmpty()) {
             recipeNameField.setError("Recipe name cannot be empty");
             return;
@@ -81,11 +93,9 @@ public class AddRecipeActivity extends AppCompatActivity {
             }
         }
 
-        // Zapisanie przepisu do bazy danych
-        MealDatabaseHelper dbHelper = new MealDatabaseHelper(this);
 
         // Zapisujemy samą nazwę przepisu z datą
-        long MealID = dbHelper.addMeal(recipeName, descriptionFormated);
+        long MealID = dbHelper.addMeal(recipeName, descriptionFormated, mealType);
 
 
         // Możemy także dodać logikę do zapisania produktów w innej tabeli, jeśli to potrzebne
