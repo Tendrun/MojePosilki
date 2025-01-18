@@ -11,7 +11,7 @@ import com.google.android.material.tabs.TabLayout;
 public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "meals.db";
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 22;
 
 
     // Table for meals
@@ -64,12 +64,6 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PROTEIN_GOAL = "protein_goal";
     private static final String COLUMN_FATS_GOAL = "fats_goal";
     private static final String COLUMN_CARBS_GOAL = "carbs_goal";
-
-
-    public MealDatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
-    }
 
     String CREATE_GOALS_TABLE = "CREATE TABLE " + TABLE_GOALS + " (" +
             COLUMN_GOAL_ID + " INTEGER PRIMARY KEY, " +
@@ -151,6 +145,11 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+
+    public MealDatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+    }
 
 
     public void DeleteAllTables(){
@@ -539,5 +538,90 @@ public class MealDatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return goals;
     }
+
+    public NutritionalInfo getNutritionalInfoByRange(long startDate, long endDate) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT " +
+                "SUM(i." + COLUMN_CALORIES + ") AS total_calories, " +
+                "SUM(i." + COLUMN_PROTEIN + ") AS total_protein, " +
+                "SUM(i." + COLUMN_FATS + ") AS total_fats, " +
+                "SUM(i." + COLUMN_CARBOHYDRATES + ") AS total_carbohydrates " +
+                "FROM " + TABLE_INGREDIENTS + " i " +
+                "JOIN " + TABLE_CALENDAR + " c ON i." + COLUMN_MEAL_ID + " = c." + COLUMN_MEAL_ID_Foreign + " " +
+                "WHERE c." + COLUMN_DATE_CALENDAR + " BETWEEN ? AND ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(startDate), String.valueOf(endDate)});
+        NutritionalInfo nutritionalInfo = new NutritionalInfo();
+
+        if (cursor.moveToFirst()) {
+            nutritionalInfo.calories = cursor.getDouble(cursor.getColumnIndex("total_calories"));
+            nutritionalInfo.protein = cursor.getDouble(cursor.getColumnIndex("total_protein"));
+            nutritionalInfo.fats = cursor.getDouble(cursor.getColumnIndex("total_fats"));
+            nutritionalInfo.carbohydrates = cursor.getDouble(cursor.getColumnIndex("total_carbohydrates"));
+        }
+
+        cursor.close();
+        return nutritionalInfo;
+    }
+
+    // Method to calculate weight change over a range
+    public double getWeightChange(long startDate, long endDate) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double startingWeight = 0.0;
+        double endingWeight = 0.0;
+
+        // Query to find the earliest weight entry on or after the start date
+        String startWeightQuery = "SELECT " + COLUMN_WEIGHT + " FROM " + TABLE_WEIGHT +
+                " WHERE " + COLUMN_DATE_CALENDAR + " >= ? " +
+                " ORDER BY " + COLUMN_DATE_CALENDAR + " ASC LIMIT 1";
+        Cursor startCursor = db.rawQuery(startWeightQuery, new String[]{String.valueOf(startDate)});
+        if (startCursor.moveToFirst()) {
+            startingWeight = startCursor.getDouble(0); // Get the first weight value
+        }
+        startCursor.close();
+
+        // Query to find the latest weight entry on or before the end date
+        String endWeightQuery = "SELECT " + COLUMN_WEIGHT + " FROM " + TABLE_WEIGHT +
+                " WHERE " + COLUMN_DATE_CALENDAR + " <= ? " +
+                " ORDER BY " + COLUMN_DATE_CALENDAR + " DESC LIMIT 1";
+        Cursor endCursor = db.rawQuery(endWeightQuery, new String[]{String.valueOf(endDate)});
+        if (endCursor.moveToFirst()) {
+            endingWeight = endCursor.getDouble(0); // Get the last weight value
+        }
+        endCursor.close();
+
+        // Return the weight difference
+        return endingWeight - startingWeight;
+    }
+
+
+    public String getExercisesFromDates(long startDate, long endDate) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        StringBuilder result = new StringBuilder();
+
+        // SQL query to get exercises within the specified date range
+        String query = "SELECT * FROM " + TABLE_EXERCISES +
+                " WHERE " + COLUMN_EXERCISE_DATE + " >= ? AND " + COLUMN_EXERCISE_DATE + " <= ?" +
+                " ORDER BY " + COLUMN_EXERCISE_DATE + " ASC";
+
+        // Execute the query with parameters
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(startDate), String.valueOf(endDate)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                // Extract values for each exercise
+                String type = cursor.getString(cursor.getColumnIndex(COLUMN_EXERCISE_TYPE));
+
+                // Append exercise details to the result
+                result.append("").append(type).append(", ");
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        // Return the result as a string
+        return result.toString();
+    }
+
 
 }

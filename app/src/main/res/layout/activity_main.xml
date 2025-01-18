@@ -51,7 +51,7 @@
         android:id="@+id/ExerciseActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Zobacz spalone kalorie"
+        android:text="Zapisz wykonane cwiczenie"
         android:layout_marginTop="20dp" />
 
     <Button
@@ -67,5 +67,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Ustaw przypomnienie" />
+
+    <Button
+        android:id="@+id/SeeCalories"
+        android:layout_width="262dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Zobacz spalanie kalorii" />
 
 </LinearLayout>

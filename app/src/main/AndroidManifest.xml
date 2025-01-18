@@ -67,5 +67,9 @@
             android:name=".ExerciseReminderActivity">
         </activity>
 
+        <activity
+            android:name=".CalorieSummaryActivity">
+        </activity>
+
     </application>
 </manifest>
